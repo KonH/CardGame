@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace Server {
 	public class Startup {
@@ -10,18 +13,34 @@ namespace Server {
 		}
 
 		public IConfiguration Configuration { get; }
-
-		// This method gets called by the runtime. Use this method to add services to the container.
+		
 		public void ConfigureServices(IServiceCollection services) {
+			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddJwtBearer(options => {
+					options.RequireHttpsMetadata = false;
+					options.TokenValidationParameters = new TokenValidationParameters {
+						ValidateIssuer = true,
+						ValidIssuer = AuthSettings.Issuer,
+						ValidateAudience = true,
+						ValidAudience = AuthSettings.Audience,
+						ValidateLifetime = true,
+						IssuerSigningKey = AuthSettings.GetSymmetricSecurityKey(),
+						ValidateIssuerSigningKey = true
+					};
+				}
+			);
 			services.AddMvc();
+			foreach ( var service in services ) {
+				
+			}
 		}
-
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+		
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
 			if ( env.IsDevelopment() ) {
 				app.UseDeveloperExceptionPage();
 			}
 
+			app.UseAuthentication();
 			app.UseMvc();
 		}
 	}
