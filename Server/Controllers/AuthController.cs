@@ -1,22 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Server.Models;
+using Server.Repositories;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 
 namespace Server.Controllers {
 	[Produces("application/json")]
 	[Route("api/auth")]
 	public class AuthController : Controller {
+		IUserRepository _users;
 
-		List<User> _users = new List<Models.User> {
-			new User() { Login = "1", Password = "2", Role = "user" }
-		};
-
-		public object AuthOptions { get; private set; }
+		public AuthController(IUserRepository users) {
+			_users = users;
+		}
 
 		[HttpGet("token")]
 		public IActionResult GetToken([FromQuery] string login, [FromQuery] string password) {
@@ -43,12 +41,12 @@ namespace Server.Controllers {
 
 		}
 
-		private ClaimsIdentity GetIdentity(string username, string password) {
-			var user = _users.FirstOrDefault(x => x.Login == username && x.Password == password);
+		private ClaimsIdentity GetIdentity(string login, string password) {
+			var user = _users.Find(login, password);
 			if ( user != null ) {
 				var claims = new List<Claim>
 				{
-					new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
+					new Claim(ClaimsIdentity.DefaultNameClaimType, user.Name),
 					new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
 				};
 				var claimsIdentity = 
