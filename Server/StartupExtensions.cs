@@ -25,5 +25,9 @@ namespace Server {
 		public static void AddUserRepository(this IServiceCollection services) {
 			services.AddSingleton<IUserRepository, InMemoryUserRepository>();
 		}
+
+		public static void AddSessionRepository(this IServiceCollection services) {
+			services.AddSingleton<SessionRepository>();
+		}
 	}
 }

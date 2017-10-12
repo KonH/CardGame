@@ -17,7 +17,7 @@ namespace Server.Controllers {
 		}
 
 		[HttpGet("token")]
-		public IActionResult GetToken([FromQuery] string login, [FromQuery] string password) {
+		public IActionResult GetToken(string login, string password) {
 			var identity = GetIdentity(login, password);
 			if ( identity == null ) {
 				return BadRequest("Invalid login or password");

@@ -15,6 +15,7 @@ namespace Server {
 			services.AddJwtBearerAuthentication();
 			services.AddMvc();
 			services.AddUserRepository();
+			services.AddSessionRepository();
 		}
 		
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
