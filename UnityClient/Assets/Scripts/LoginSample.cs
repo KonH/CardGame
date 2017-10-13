@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using UDBase.Utils;
 using FullSerializer;
 using System;
+using UDBase.Controllers.SceneSystem;
 
 public class LoginSample : MonoBehaviour {
 
@@ -44,6 +45,7 @@ public class LoginSample : MonoBehaviour {
 			if ( token != null ) {
 				ResultText.text = token.Token + ";" + token.UserName;
 				_client.ApplyAuthHeader("Bearer " + token.Token);
+				Scene.LoadSceneByName("Main");
 			}
 		}
 	}
