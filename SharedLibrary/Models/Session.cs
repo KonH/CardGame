@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using Server.Common;
+using SharedLibrary.Common;
 
-namespace Server.Models {
+namespace SharedLibrary.Models {
 	public class Session {
 		public string Id;
 		public List<string> Users = new List<string>();
