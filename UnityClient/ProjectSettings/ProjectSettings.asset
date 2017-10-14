@@ -501,6 +501,7 @@ PlayerSettings:
   webGLCompressionFormat: 1
   scriptingDefineSymbols:
     1: Scheme_DevScheme;Scheme_Declared
+    13: Scheme_DevScheme;Scheme_Declared
   platformArchitecture: {}
   scriptingBackend: {}
   incrementalIl2cppBuild: {}
