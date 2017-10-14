@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 
 namespace Server {
 	public class Startup {
@@ -13,7 +14,7 @@ namespace Server {
 		
 		public void ConfigureServices(IServiceCollection services) {
 			services.AddJwtBearerAuthentication();
-			services.AddMvc();
+			services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 			services.AddUserRepository();
 			services.AddSessionRepository();
 		}
