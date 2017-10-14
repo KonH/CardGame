@@ -9,9 +9,9 @@ public class LoginSample : MonoBehaviour {
 
 	class Jwtoken {
 		[fsProperty("token")]
-		public string Token;
+		public string Token = "";
 		[fsProperty("userName")]
-		public string UserName;
+		public string UserName = "";
 	}
 
 	public InputField LoginField;
@@ -40,11 +40,17 @@ public class LoginSample : MonoBehaviour {
 
 	void OnAuthComplete(NetUtils.Response resp) {
 		ResultText.text = resp.Text;
+		Debug.Log(resp.Text);
 		if ( !resp.HasError ) {
 			var token = ExtractToken(resp.Text);
 			if ( token != null ) {
 				ResultText.text = token.Token + ";" + token.UserName;
-				_client.ApplyAuthHeader("Bearer " + token.Token);
+				var header = "Bearer " + token.Token;
+				Debug.Log(header);
+				TempStorage.AuthHeader = header;
+				TempStorage.UserName = token.UserName;
+				_client.ApplyAuthHeader(header);
+				Debug.Log("Before load");
 				Scene.LoadSceneByName("Main");
 			}
 		}
