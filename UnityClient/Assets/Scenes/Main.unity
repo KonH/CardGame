@@ -630,6 +630,7 @@ GameObject:
   - component: {fileID: 1315587136}
   - component: {fileID: 1315587138}
   - component: {fileID: 1315587137}
+  - component: {fileID: 1315587139}
   m_Layer: 5
   m_Name: UserNameText
   m_TagString: Untagged
@@ -694,6 +695,17 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1315587135}
+--- !u!114 &1315587139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1315587135}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b87ae0efa05fc30469e868a405521ea5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1777519642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1221,7 +1233,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   View: {fileID: 1777519647}
-  UserText: {fileID: 1315587137}
   CreateButton: {fileID: 1863387824}
 --- !u!1 &2109758417
 GameObject:
