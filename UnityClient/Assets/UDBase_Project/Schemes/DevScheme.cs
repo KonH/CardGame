@@ -9,7 +9,7 @@ using UDBase.Controllers.UserSystem;
 public class ProjectScheme : Scheme {
 
 	public ProjectScheme() {
-		var save = new FsJsonDataSave();
+		var save = new InMemorySave();
 		save.AddNode<UserSaveNode>("user");
 		AddController<Save>(save);
 
