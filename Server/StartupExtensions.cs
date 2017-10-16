@@ -1,10 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Server.Repositories;
 
 namespace Server {
 	public static class StartupExtensions {
+		public static void AddFullCors(this IServiceCollection services) {
+			services.AddCors(o => o.AddPolicy("FullCorsPolicy", builder => {
+				builder
+					.AllowAnyOrigin()
+					.AllowAnyMethod()
+					.AllowAnyHeader();
+			}));
+		}
+
+		public static void UseFullCors(this IApplicationBuilder app) {
+			app.UseCors("FullCorsPolicy");
+		}
+
 		public static void AddJwtBearerAuthentication(this IServiceCollection services) {
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options => {

@@ -13,6 +13,7 @@ namespace Server {
 		public IConfiguration Configuration { get; }
 		
 		public void ConfigureServices(IServiceCollection services) {
+			services.AddFullCors();
 			services.AddJwtBearerAuthentication();
 			services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 			services.AddUserRepository();
@@ -23,7 +24,7 @@ namespace Server {
 			if ( env.IsDevelopment() ) {
 				app.UseDeveloperExceptionPage();
 			}
-
+			app.UseFullCors();
 			app.UseAuthentication();
 			app.UseMvc();
 		}
