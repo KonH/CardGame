@@ -40,24 +40,18 @@ public class SessionController : ISessionController {
 	const string _createUrl = "{0}/api/session";
 	const string _connectUrl = "{0}/api/session/connect/{1}";
 
-	WebClient _client = new WebClient();
+	BearerWebClient _client = new BearerWebClient();
 	List<Session> _sessions = new List<Session>();
 
 	public void Init() {
-		Events.Subscribe<Auth_UpdateHeader>(this, OnUpdateAuthHeader);
+		_client.Init();
+		
 	}
 
 	public void PostInit() {}
 
 	public void Reset() {
-		Events.Unsubscribe<Auth_UpdateHeader>(OnUpdateAuthHeader);
-	}
-
-	void OnUpdateAuthHeader(Auth_UpdateHeader e) {
-		if ( !string.IsNullOrEmpty(e.AuthHeader) ) {
-			Log.MessageFormat("OnUpdateAuthHeader: new header = '{0}'", LogTags.Session, e.AuthHeader);
-			_client.ApplyAuthHeader(e.AuthHeader);
-		}
+		_client.Reset();
 	}
 
 	public void TryConnect(string sessionId) {
