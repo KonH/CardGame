@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using SharedLibrary.Models;
+﻿using System.Linq;
+using System.Collections.Generic;
 using UDBase.Controllers;
 using UDBase.Utils;
 using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.EventSystem;
-using FullSerializer;
-using System;
-using System.Linq;
 using UDBase.Controllers.UserSystem;
+using UDBase.Utils.Json;
+using SharedLibrary.Models;
 
 public interface ISessionController : IController {
 	string CurrentSessionId { get; }
@@ -113,14 +112,8 @@ public class SessionController : ISessionController {
 	}
 
 	void SetupSessions(string json) {
-		var serializer = new fsSerializer();
-		try {
-			var data = fsJsonParser.Parse(json);
-			_sessions.Clear();
-			serializer.TryDeserialize(data, ref _sessions);
-		} catch ( Exception e ) {
-			Log.ErrorFormat("SetupSessions: exception: {0}", LogTags.Session, e);
-		}
+		_sessions.Clear();
+		_sessions = JsonUtils.Serialize<List<Session>>(json);
 	}
 
 	public void TryCreate() {

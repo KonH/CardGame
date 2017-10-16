@@ -5,6 +5,7 @@ using UDBase.Controllers.EventSystem;
 using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.UserSystem;
 using UDBase.Utils;
+using UDBase.Utils.Json;
 
 public interface IAuthController : IController {
 	string Login { get; }
@@ -137,15 +138,7 @@ class AuthController : IAuthController {
 	}
 
 	Jwtoken ExtractToken(string json) {
-		var serializer = new fsSerializer();
-		Jwtoken token = null;
-		try {
-			var data = fsJsonParser.Parse(json);
-			serializer.TryDeserialize(data, ref token);
-		} catch ( Exception e ) {
-			Log.ErrorFormat("ExtractToken: exception: {0}", LogTags.Auth, e);
-		}
-		return token;
+		return JsonUtils.Serialize<Jwtoken>(json);
 	}
 }
 

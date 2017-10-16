@@ -24,3 +24,11 @@ public struct Session_Update {
 		Sessions = sessions;
 	}
 }
+
+public struct Game_Init {
+	public GameState State { get; private set; }
+	
+	public Game_Init(GameState state) {
+		State = state;
+	}
+}
