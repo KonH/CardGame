@@ -56,7 +56,7 @@ public class SessionController : ISessionController {
 
 	public void TryConnect(string sessionId) {
 		if ( !_client.InProgress ) {
-			_client.SendPostRequest(string.Format(_connectUrl, Configs.BaseUrl, sessionId), "", onComplete: (resp) => OnConnectComplete(sessionId, resp));
+			_client.SendPostRequest(CardUrl.Prepare(_connectUrl, sessionId), "", onComplete: (resp) => OnConnectComplete(sessionId, resp));
 		}
 	}
 
@@ -70,7 +70,7 @@ public class SessionController : ISessionController {
 	public void TryRefresh() {
 		if ( !_client.InProgress ) {
 			Log.Message("TryRefresh.", LogTags.Session);
-			_client.SendGetRequest(string.Format(_refreshUrl, Configs.BaseUrl), onComplete: OnRefreshSessionsComplete);
+			_client.SendGetRequest(CardUrl.Prepare(_refreshUrl), onComplete: OnRefreshSessionsComplete);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class SessionController : ISessionController {
 	public void TryCreate() {
 		if ( !_client.InProgress ) {
 			Log.Message("TryCreate.", LogTags.Session);
-			_client.SendPostRequest(string.Format(_createUrl, Configs.BaseUrl), "");
+			_client.SendPostRequest(CardUrl.Prepare(_createUrl), "");
 		}
 	}
 }

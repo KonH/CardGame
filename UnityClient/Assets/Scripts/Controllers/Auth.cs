@@ -112,7 +112,7 @@ class AuthController : IAuthController {
 		Password = password;
 		Log.MessageFormat("TryLogin: login: '{0}', password: '{1}'", LogTags.Auth, login, password);
 		if ( !_client.InProgress ) {
-			var request = string.Format(_authUrl, Configs.BaseUrl, login, password);
+			var request = CardUrl.Prepare(_authUrl, login, password);
 			_client.SendGetRequest(request, onComplete: resp => OnLoginComplete(resp, onComplete));
 		}
 	}
