@@ -10,12 +10,22 @@ using System.Linq;
 using UDBase.Controllers.UserSystem;
 
 public interface ISessionController : IController {
+	string CurrentSessionId { get; }
 	void TryConnect(string sessionId);
 	void TryRefresh();
 	void TryCreate();
+	void TryClose();
 }
 
 public class Sessions : ControllerHelper<ISessionController> {
+	public string CurrentSessionId {
+		get {
+			if ( Instance != null ) {
+				return Instance.CurrentSessionId;
+			}
+			return null;
+		}
+	}
 	public static void TryConnect(string sessionId) {
 		if ( Instance != null ) {
 			Instance.TryConnect(sessionId);
@@ -33,19 +43,27 @@ public class Sessions : ControllerHelper<ISessionController> {
 			Instance.TryCreate();
 		}
 	}
+
+	public static void TryClose() {
+		if ( Instance != null ) {
+			Instance.TryClose();
+		}
+	}
 }
 
 public class SessionController : ISessionController {
 	const string _refreshUrl = "{0}/api/session";
 	const string _createUrl = "{0}/api/session";
+	const string _closeUrl = "{0}/api/session/{1}";
 	const string _connectUrl = "{0}/api/session/connect/{1}";
+
+	public string CurrentSessionId { get; private set; }
 
 	BearerWebClient _client = new BearerWebClient();
 	List<Session> _sessions = new List<Session>();
 
 	public void Init() {
 		_client.Init();
-		
 	}
 
 	public void PostInit() {}
@@ -85,9 +103,12 @@ public class SessionController : ISessionController {
 	void UpdateUserSession(List<Session> sessions) {
 		var userSession = sessions.Where(s => s.Owner == User.Name).FirstOrDefault();
 		if ( userSession != null ) {
+			CurrentSessionId = userSession.Id;
 			if ( !userSession.Awaiting ) {
 				Events.Fire(new Session_ConnectComplete(userSession.Id));
 			}
+		} else {
+			CurrentSessionId = null;
 		}
 	}
 
@@ -95,6 +116,7 @@ public class SessionController : ISessionController {
 		var serializer = new fsSerializer();
 		try {
 			var data = fsJsonParser.Parse(json);
+			_sessions.Clear();
 			serializer.TryDeserialize(data, ref _sessions);
 		} catch ( Exception e ) {
 			Log.ErrorFormat("SetupSessions: exception: {0}", LogTags.Session, e);
@@ -105,6 +127,13 @@ public class SessionController : ISessionController {
 		if ( !_client.InProgress ) {
 			Log.Message("TryCreate.", LogTags.Session);
 			_client.SendPostRequest(CardUrl.Prepare(_createUrl), "");
+		}
+	}
+
+	public void TryClose() {
+		if ( !_client.InProgress && !string.IsNullOrEmpty(CurrentSessionId) ) {
+			Log.Message("TryClose", LogTags.Session);
+			_client.SendDeleteRequest(CardUrl.Prepare(_closeUrl, CurrentSessionId));
 		}
 	}
 }

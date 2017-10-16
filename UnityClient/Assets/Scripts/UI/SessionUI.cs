@@ -10,6 +10,7 @@ using UDBase.Controllers.EventSystem;
 public class SessionUI : MonoBehaviour {
 	public SessionView View;
 	public Button CreateButton;
+	public Button CloseButton;
 
 	float _lastTime;
 	float _updateInterval = 3;
@@ -17,6 +18,7 @@ public class SessionUI : MonoBehaviour {
 	void Awake() {
 		_lastTime = -_updateInterval;
 		CreateButton.onClick.AddListener(TryCreate);
+		CloseButton.onClick.AddListener(TryClose);
 	}
 
 	void Start() {
@@ -56,6 +58,10 @@ public class SessionUI : MonoBehaviour {
 
 	public void TryCreate() {
 		Sessions.TryCreate();
+	}
+
+	public void TryClose() {
+		Sessions.TryClose();
 	}
 
 	void Update() {
