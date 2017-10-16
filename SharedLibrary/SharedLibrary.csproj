@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\SessionRules.cs" />
+    <Compile Include="Models\GameState.cs" />
+    <Compile Include="Models\Game\UserState.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
