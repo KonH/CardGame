@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SharedLibrary.Models;
 using Server.Repositories;
-using System;
+using Microsoft.Extensions.Configuration;
 
 namespace Server.Controllers {
 	[Authorize]
@@ -11,11 +13,15 @@ namespace Server.Controllers {
 	[Route("api/session")]
 	public class SessionController : Controller {
 		ILogger _logger;
+		bool _withAutoConnect;
 		SessionRepository _sessions;
+		IUserRepository _users;
 
-		public SessionController(ILoggerFactory loggingFactory, SessionRepository sessions) {
+		public SessionController(ILoggerFactory loggingFactory, IConfiguration config, SessionRepository sessions, IUserRepository users) {
 			_logger = loggingFactory.CreateLogger<SessionController>();
+			_withAutoConnect = bool.Parse(config["Auto-Connect"]);
 			_sessions = sessions;
+			_users = users;
 		}
 
 		[HttpGet]
@@ -29,10 +35,18 @@ namespace Server.Controllers {
 			var creator = User.Identity.Name;
 			var session = new Session(id, creator);
 			if ( _sessions.TryAdd(session) ) {
+				TryUseAutoConnect(session);
 				return Json(session);
 			}
 			_logger.LogWarning("Can't create session");
 			return BadRequest("Can't create session");
+		}
+
+		void TryUseAutoConnect(Session session) {
+			if ( _withAutoConnect ) {
+				var anotherUser = _users.All.First(u => u.Name != session.Owner).Name;
+				session.Users.Add(anotherUser);
+			}
 		}
 
 		[HttpDelete("{id}")]
