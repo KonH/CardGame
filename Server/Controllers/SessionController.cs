@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SharedLibrary.Models;
 using Server.Repositories;
 using System;
@@ -9,9 +10,11 @@ namespace Server.Controllers {
 	[Produces("application/json")]
 	[Route("api/session")]
 	public class SessionController : Controller {
+		ILogger _logger;
 		SessionRepository _sessions;
 
-		public SessionController(SessionRepository sessions) {
+		public SessionController(ILoggerFactory loggingFactory, SessionRepository sessions) {
+			_logger = loggingFactory.CreateLogger<SessionController>();
 			_sessions = sessions;
 		}
 
@@ -28,6 +31,7 @@ namespace Server.Controllers {
 			if ( _sessions.TryAdd(session) ) {
 				return Json(session);
 			}
+			_logger.LogWarning("Can't create session");
 			return BadRequest("Can't create session");
 		}
 
@@ -35,9 +39,15 @@ namespace Server.Controllers {
 		public IActionResult Delete(string id) {
 			var session = _sessions.Find(id);
 			if ( session != null ) {
-				if ( (User.Identity.Name == session.Owner) && _sessions.TryDelete(id) ) {
+				var isUserSession = (User.Identity.Name == session.Owner);
+				if ( isUserSession && _sessions.TryDelete(id) ) {
 					return Ok();
 				}
+				if ( !isUserSession ) {
+					_logger.LogWarning("Can't delete session: It is not user session");
+				}
+			} else {
+				_logger.LogWarning("Can't delete session: Can't find session");
 			}
 			return BadRequest("Can't delete session");
 		}
@@ -50,6 +60,14 @@ namespace Server.Controllers {
 				if ( !session.Users.Contains(userName) ) {
 					session.Users.Add(userName);
 					return Ok();
+				} else {
+					_logger.LogWarning($"Can't connect to session: Already connected");
+				}
+			} else {
+				if ( session == null ) {
+					_logger.LogWarning($"Can't connect to session: Can't find session");
+				} else if ( !session.Awaiting ) {
+					_logger.LogWarning($"Can't connect to session: Session isn't awaiting");
 				}
 			}
 			return BadRequest("Can't connect to session");
