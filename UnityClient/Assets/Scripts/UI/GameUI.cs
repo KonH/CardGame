@@ -1,4 +1,5 @@
-﻿using SharedLibrary.Models.Game;
+﻿using SharedLibrary.Models;
+using SharedLibrary.Models.Game;
 using UDBase.Controllers.EventSystem;
 using UDBase.Controllers.UserSystem;
 using UnityEngine;
@@ -17,15 +18,29 @@ public class GameUI : MonoBehaviour {
 
 	void Start() {
 		Events.Subscribe<Game_Init>(this, OnGameInit);
+		Events.Subscribe<Game_Reload>(this, OnGameReload);
 		Game.Start();
 	}
 
 	void OnDestroy() {
 		Events.Unsubscribe<Game_Init>(OnGameInit);
+		Events.Unsubscribe<Game_Reload>(OnGameReload);
+	}
+
+	void Update() {
+		Game.Update();
 	}
 
 	void OnGameInit(Game_Init e) {
-		var users = e.State.Users;
+		FullStateUpdate(e.State);
+	}
+
+	void OnGameReload(Game_Reload e) {
+		FullStateUpdate(e.State);
+	}
+
+	void FullStateUpdate(GameState state) {
+		var users = state.Users;
 		foreach ( var user in users ) {
 			DrawUserState(user);
 		}
@@ -49,6 +64,6 @@ public class GameUI : MonoBehaviour {
 	}
 
 	void OnAttack() {
-
+		Game.ApplyTestAttack();
 	}
 }

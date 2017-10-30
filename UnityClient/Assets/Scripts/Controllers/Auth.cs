@@ -138,7 +138,7 @@ class AuthController : IAuthController {
 	}
 
 	Jwtoken ExtractToken(string json) {
-		return JsonUtils.Serialize<Jwtoken>(json);
+		return JsonUtils.Deserialize<Jwtoken>(json);
 	}
 }
 

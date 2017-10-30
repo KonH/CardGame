@@ -113,7 +113,7 @@ public class SessionController : ISessionController {
 
 	void SetupSessions(string json) {
 		_sessions.Clear();
-		_sessions = JsonUtils.Serialize<List<Session>>(json);
+		_sessions = JsonUtils.Deserialize<List<Session>>(json);
 	}
 
 	public void TryCreate() {

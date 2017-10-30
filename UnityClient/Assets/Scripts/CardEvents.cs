@@ -32,3 +32,11 @@ public struct Game_Init {
 		State = state;
 	}
 }
+
+public struct Game_Reload {
+	public GameState State { get; private set; }
+
+	public Game_Reload(GameState state) {
+		State = state;
+	}
+}
