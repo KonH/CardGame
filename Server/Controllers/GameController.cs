@@ -2,28 +2,34 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Models.Game;
 using SharedLibrary.Actions;
 using SharedLibrary.Utils;
+using SharedLibrary.AI;
 
 namespace Server.Controllers {
 	[Authorize]
 	[Produces("application/json")]
 	[Route("api/game")]
 	public class GameController : Controller {
+		static GameAI _botUser = new GameAI("user2");
 		static GameState _state = new GameState("", new List<UserState> {
 				new UserState("user1", 10),
 				new UserState("user2", 10)
-			}
+			},
+			"user1"
 		);
 		static List<IGameAction> _actions = new List<IGameAction>();
 
+		bool _botPlay;
 		ILogger _logger;
 
-		public GameController(ILoggerFactory loggerFactory) {
+		public GameController(IConfiguration config, ILoggerFactory loggerFactory) {
+			_botPlay = bool.Parse(config["Simple-Bot"]);
 			_logger = loggerFactory.CreateLogger(typeof(GameController));
 		}
 
@@ -57,14 +63,27 @@ namespace Server.Controllers {
 				var actionInstance = action.ToObject(typeInstance) as IGameAction;
 				if ( actionInstance != null ) {
 					lock ( _state ) {
+						actionInstance.User = User.Identity.Name;
 						if ( _state.TryApply(actionInstance) ) {
 							_actions.Add(actionInstance);
+							TryAddBotAction();
 							return Ok();
 						}
 					}
 				}
 			}
 			return BadRequest();
+		}
+
+		void TryAddBotAction() {
+			if ( _botPlay ) {
+				var botAction = _botUser.GetAction(_state);
+				if ( botAction != null ) {
+					if ( _state.TryApply(botAction) ) {
+						_actions.Add(botAction);
+					}
+				}
+			}
 		}
 	}
 }

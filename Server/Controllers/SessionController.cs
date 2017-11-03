@@ -19,7 +19,7 @@ namespace Server.Controllers {
 
 		public SessionController(ILoggerFactory loggingFactory, IConfiguration config, SessionRepository sessions, IUserRepository users) {
 			_logger = loggingFactory.CreateLogger<SessionController>();
-			_withAutoConnect = bool.Parse(config["Auto-Connect"]);
+			_withAutoConnect = bool.Parse(config["Simple-Bot"]);
 			_sessions = sessions;
 			_users = users;
 		}
