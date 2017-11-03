@@ -18,6 +18,7 @@ namespace Server {
 			services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 			services.AddUserRepository();
 			services.AddSessionRepository();
+			services.AddGameRepository();
 		}
 		
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env) {

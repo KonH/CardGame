@@ -43,5 +43,9 @@ namespace Server {
 		public static void AddSessionRepository(this IServiceCollection services) {
 			services.AddSingleton<SessionRepository>();
 		}
+
+		public static void AddGameRepository(this IServiceCollection services) {
+			services.AddSingleton<GameRepository>();
+		}
 	}
 }

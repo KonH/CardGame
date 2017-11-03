@@ -1,19 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Server.Repositories;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Server.Repositories;
 
 namespace Server.Controllers {
 	[Produces("application/json")]
 	[Route("api/auth")]
 	public class AuthController : Controller {
 		IUserRepository _users;
+		ILogger _logger;
 
-		public AuthController(IUserRepository users) {
+		public AuthController(IUserRepository users, ILoggerFactory loggerFactory) {
 			_users = users;
+			_logger = loggerFactory.CreateLogger<AuthController>();
 		}
 
 		[HttpGet("token")]
@@ -37,8 +40,8 @@ namespace Server.Controllers {
 				token = encodedJwt,
 				userName = identity.Name
 			};
+			_logger.LogDebug("User is logged in: '{0}'", identity.Name);
 			return Json(response);
-
 		}
 
 		private ClaimsIdentity GetIdentity(string login, string password) {

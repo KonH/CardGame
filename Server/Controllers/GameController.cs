@@ -1,54 +1,50 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using SharedLibrary.Common;
-using SharedLibrary.Models;
-using SharedLibrary.Models.Game;
 using SharedLibrary.Actions;
 using SharedLibrary.Utils;
-using SharedLibrary.AI;
+using Server.Repositories;
+using Server.Models;
 
 namespace Server.Controllers {
 	[Authorize]
 	[Produces("application/json")]
 	[Route("api/game")]
 	public class GameController : Controller {
-		static GameAI _botUser = new GameAI("user2");
-		static GameState _state = new GameState("", new List<UserState> {
-				new UserState("user1", 10),
-				new UserState("user2", 10)
-			},
-			"user1"
-		);
-		static List<IGameAction> _actions = new List<IGameAction>();
-
-		bool _botPlay;
 		ILogger _logger;
+		GameRepository _games;
 
-		public GameController(IConfiguration config, ILoggerFactory loggerFactory) {
-			_botPlay = bool.Parse(config["Simple-Bot"]);
+		public GameController(GameRepository games, ILoggerFactory loggerFactory) {
+			_games = games;
 			_logger = loggerFactory.CreateLogger(typeof(GameController));
 		}
 
 		[HttpGet("state")]
-		public IActionResult GetGameState() {
+		public IActionResult GetGameState(string session) {
 			// TODO: Filter user state
-			return Json(_state);
+			var state = _games.Find(session);
+			if ( state != null ) {
+				return Json(state.SharedState);
+			}
+			return BadRequest("Can't find game");
 		}
 
-		IGameAction GetActionForVersion(int version) {
-			if ( _actions.Count > version ) {
-				return _actions[version];
+		IGameAction GetActionForVersion(ServerGameState state, int version) {
+			if ( state.Actions.Count > version ) {
+				return state.Actions[version];
 			}
 			return null;
 		}
 
 		[HttpGet("action")]
-		public IActionResult GetAction(int version) {
-			var action = GetActionForVersion(version);
+		public IActionResult GetAction(string session, int version) {
+			var state = _games.Find(session);
+			if ( state == null ) {
+				return BadRequest("Can't find game");
+			}
+			var action = GetActionForVersion(state, version);
 			if ( action != null ) {
 				Response.HttpContext.Response.Headers.Add(Interaction.ActionTypeHeader, action.GetType().ToString());
 				return Json(action);
@@ -57,33 +53,28 @@ namespace Server.Controllers {
 		}
 
 		[HttpPost("action")]
-		public IActionResult PostAction(int version, string type, [FromBody] JObject action) {
+		public IActionResult PostAction(string session, int version, string type, [FromBody] JObject action) {
+			var state = _games.Find(session);
+			if ( state == null ) {
+				return BadRequest("Can't find game");
+			}
 			var typeInstance = ReflectionUtils.GetActionType(type);
 			if ( typeInstance != null ) {
 				var actionInstance = action.ToObject(typeInstance) as IGameAction;
 				if ( actionInstance != null ) {
-					lock ( _state ) {
+					lock ( state ) {
 						actionInstance.User = User.Identity.Name;
-						if ( _state.TryApply(actionInstance) ) {
-							_actions.Add(actionInstance);
-							TryAddBotAction();
+						if ( state.SharedState.TryApply(actionInstance) ) {
+							_games.AddAction(state, actionInstance);
 							return Ok();
 						}
 					}
 				}
 			}
+			_logger.LogWarning(
+				"[{0}] User: '{1}', action (type: '{2}'): {3}",
+				session, User.Identity.Name, type, action.ToString());
 			return BadRequest();
-		}
-
-		void TryAddBotAction() {
-			if ( _botPlay ) {
-				var botAction = _botUser.GetAction(_state);
-				if ( botAction != null ) {
-					if ( _state.TryApply(botAction) ) {
-						_actions.Add(botAction);
-					}
-				}
-			}
 		}
 	}
 }

@@ -3,7 +3,7 @@
 - [x] Two users can play in one session
 - [x] User can make actions at his turn
 - [x] User can complete his turn (switch to other player turn)
-- [ ] First turn - to random player
+- [x] First turn - to random player
 - [ ] User has global, hand and table card sets
 - [ ] User has resources, its max count is increased every turn and restored
 - [ ] Every turn user gets one card from global set to hand set (if hand set is not full)

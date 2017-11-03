@@ -3,9 +3,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SharedLibrary.Models;
-using Server.Repositories;
 using Microsoft.Extensions.Configuration;
+using Server.Repositories;
+using Server.Helpers;
+using SharedLibrary.Common;
+using SharedLibrary.Models;
 
 namespace Server.Controllers {
 	[Authorize]
@@ -13,15 +15,23 @@ namespace Server.Controllers {
 	[Route("api/session")]
 	public class SessionController : Controller {
 		ILogger _logger;
-		bool _withAutoConnect;
+		bool _botPlay;
 		SessionRepository _sessions;
 		IUserRepository _users;
+		GameRepository _games;
 
-		public SessionController(ILoggerFactory loggingFactory, IConfiguration config, SessionRepository sessions, IUserRepository users) {
+		public SessionController(
+			ILoggerFactory loggingFactory,
+			IConfiguration config,
+			SessionRepository sessions,
+			IUserRepository users,
+			GameRepository games) 
+		{
 			_logger = loggingFactory.CreateLogger<SessionController>();
-			_withAutoConnect = bool.Parse(config["Simple-Bot"]);
+			_botPlay = bool.Parse(config["Simple-Bot"]);
 			_sessions = sessions;
 			_users = users;
+			_games = games;
 		}
 
 		[HttpGet]
@@ -35,6 +45,7 @@ namespace Server.Controllers {
 			var creator = User.Identity.Name;
 			var session = new Session(id, creator);
 			if ( _sessions.TryAdd(session) ) {
+				_logger.LogDebug("New session: '{0}' (creator: '{1}')", id, creator);
 				TryUseAutoConnect(session);
 				return Json(session);
 			}
@@ -43,9 +54,10 @@ namespace Server.Controllers {
 		}
 
 		void TryUseAutoConnect(Session session) {
-			if ( _withAutoConnect ) {
+			if ( _botPlay ) {
 				var anotherUser = _users.All.First(u => u.Name != session.Owner).Name;
 				session.Users.Add(anotherUser);
+				TryCreateGame(session, anotherUser);
 			}
 		}
 
@@ -55,6 +67,7 @@ namespace Server.Controllers {
 			if ( session != null ) {
 				var isUserSession = (User.Identity.Name == session.Owner);
 				if ( isUserSession && _sessions.TryDelete(id) ) {
+					_logger.LogDebug("Delete session: '{0}' (user: '{1}')", id, session.Owner);
 					return Ok();
 				}
 				if ( !isUserSession ) {
@@ -73,6 +86,8 @@ namespace Server.Controllers {
 				var userName = User.Identity.Name;
 				if ( !session.Users.Contains(userName) ) {
 					session.Users.Add(userName);
+					_logger.LogDebug("Connect to session: '{0}' (user: '{1}')", id, userName);
+					TryCreateGame(session);
 					return Ok();
 				} else {
 					_logger.LogWarning($"Can't connect to session: Already connected");
@@ -85,6 +100,25 @@ namespace Server.Controllers {
 				}
 			}
 			return BadRequest("Can't connect to session");
+		}
+
+		void TryCreateGame(Session session, string botUserName = null) {
+			if ( session.Awaiting ) {
+				return;
+			}
+			var rand = new Random(DateTime.Now.Millisecond);
+			var turnOwnerIndex = rand.Next(session.Users.Count);
+			var turnOwner = session.Users[turnOwnerIndex];
+			var gameBuilder = 
+				new GameBuilder(session.Id, session.Users, GameRules.DefaultHealth).WithTurnOwner(turnOwner);
+			if ( !string.IsNullOrEmpty(botUserName) ) {
+				gameBuilder.WithBot(botUserName);
+			}
+			if ( _games.TryAdd(gameBuilder.Build()) ) {
+				_logger.LogDebug("Game for session '{0}' is created (first turn to: '{1}')", session.Id, turnOwner);
+			} else {
+				_logger.LogError("Can't create game for session: '{0}'", session.Id);
+			}
 		}
 	}
 }
