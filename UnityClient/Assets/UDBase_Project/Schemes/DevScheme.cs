@@ -20,7 +20,7 @@ public class ProjectScheme : Scheme {
 
 		AddController<Auth>(new AuthController());
 		AddController<Sessions>(new SessionController());
-		AddController<Game>(new GameController());
+		AddController<Game>(new GameController(1.0f));
 	}
 }
 #endif

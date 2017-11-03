@@ -1,10 +1,11 @@
-﻿using SharedLibrary.Common;
-using SharedLibrary.Actions;
-using SharedLibrary.Models;
+﻿using UnityEngine;
 using UDBase.Controllers;
 using UDBase.Controllers.EventSystem;
 using UDBase.Utils;
 using UDBase.Utils.Json;
+using SharedLibrary.Common;
+using SharedLibrary.Actions;
+using SharedLibrary.Models;
 using SharedLibrary.Utils;
 
 public interface IGame : IController {
@@ -49,19 +50,25 @@ public class Game : ControllerHelper<IGame> {
 
 public class GameController : IGame {
 	const string _getStateUrl = "{0}/api/game/state";
-	const string _getActionUrl = "{0}/api/game/action?version={1}"; // TODO: get interval
+	const string _getActionUrl = "{0}/api/game/action?version={1}";
 	const string _postActionUrl = "{0}/api/game/action?version={1}&type={2}";
 
 	BearerWebClient _updateClient = new BearerWebClient();
 	BearerWebClient _postClient = new BearerWebClient();
 	GameState _state;
+	float _updateInterval;
 
 	bool _ready;
+	float _lastUpdateTime;
 
 	bool IsBusy {
 		get {
 			return _postClient.InProgress;
 		}
+	}
+
+	public GameController(float updateInterval) {
+		_updateInterval = updateInterval;
 	}
 
 	public void Init() {
@@ -80,8 +87,12 @@ public class GameController : IGame {
 		_updateClient.SendGetRequest(CardUrl.Prepare(_getStateUrl), onComplete: OnStartComplete);
 	}
 
+	bool IsNeedToUpdate() {
+		return !_updateClient.InProgress && !IsBusy && (Time.realtimeSinceStartup > _lastUpdateTime + _updateInterval);
+	}
+
 	public void Update() {
-		if ( _ready && !_updateClient.InProgress && !IsBusy ) {
+		if ( _ready && IsNeedToUpdate() ) {
 			_updateClient.SendGetRequest(CardUrl.Prepare(_getActionUrl, _state.Version.ToString()), onComplete: OnGetActionComplete);
 		}
 	}
@@ -99,6 +110,7 @@ public class GameController : IGame {
 	}
 
 	void OnGetActionComplete(NetUtils.Response resp) {
+		_lastUpdateTime = Time.realtimeSinceStartup;
 		if ( !resp.HasError ) {
 			ProcessNewAction(GetTypeHeader(resp), resp.Text);
 		}
