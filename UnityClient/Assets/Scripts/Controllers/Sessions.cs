@@ -80,6 +80,7 @@ public class SessionController : ISessionController {
 	void OnConnectComplete(string id, NetUtils.Response resp) {
 		Log.MessageFormat("OnConnectComplete: {0}, '{1}'", LogTags.Session, resp.Code, resp.Text);
 		if ( !resp.HasError ) {
+			CurrentSessionId = id;
 			Events.Fire(new Session_ConnectComplete(id));
 		}
 	}
