@@ -50,6 +50,7 @@
     <Compile Include="Actions\IGameAction.cs" />
     <Compile Include="AI\GameAI.cs" />
     <Compile Include="Common\Interaction.cs" />
+    <Compile Include="Common\GameRules.cs" />
     <Compile Include="Common\SessionRules.cs" />
     <Compile Include="Common\GameStateExtensions.cs" />
     <Compile Include="Models\GameState.cs" />
