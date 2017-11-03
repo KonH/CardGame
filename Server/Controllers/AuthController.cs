@@ -14,9 +14,9 @@ namespace Server.Controllers {
 		IUserRepository _users;
 		ILogger _logger;
 
-		public AuthController(IUserRepository users, ILoggerFactory loggerFactory) {
+		public AuthController(IUserRepository users, ILogger<AuthController> logger) {
 			_users = users;
-			_logger = loggerFactory.CreateLogger<AuthController>();
+			_logger = logger;
 		}
 
 		[HttpGet("token")]

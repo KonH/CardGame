@@ -9,8 +9,8 @@ namespace Server.Repositories {
 		ILogger _logger;
 		ConcurrentDictionary<string, ServerGameState> _games = new ConcurrentDictionary<string, ServerGameState>();
 
-		public GameRepository(ILoggerFactory loggerFactory) {
-			_logger = loggerFactory.CreateLogger<GameRepository>();
+		public GameRepository(ILogger<GameRepository> logger) {
+			_logger = logger;
 		}
 
 		public bool TryAdd(ServerGameState game) {

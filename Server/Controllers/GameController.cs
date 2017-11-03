@@ -16,9 +16,9 @@ namespace Server.Controllers {
 		ILogger _logger;
 		GameRepository _games;
 
-		public GameController(GameRepository games, ILoggerFactory loggerFactory) {
+		public GameController(GameRepository games, ILogger<GameController> logger) {
 			_games = games;
-			_logger = loggerFactory.CreateLogger(typeof(GameController));
+			_logger = logger;
 		}
 
 		[HttpGet("state")]

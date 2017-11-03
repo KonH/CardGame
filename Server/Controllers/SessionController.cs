@@ -21,13 +21,13 @@ namespace Server.Controllers {
 		GameRepository _games;
 
 		public SessionController(
-			ILoggerFactory loggingFactory,
+			ILogger<SessionController> logger,
 			IConfiguration config,
 			SessionRepository sessions,
 			IUserRepository users,
 			GameRepository games) 
 		{
-			_logger = loggingFactory.CreateLogger<SessionController>();
+			_logger = logger;
 			_botPlay = bool.Parse(config["Simple-Bot"]);
 			_sessions = sessions;
 			_users = users;
