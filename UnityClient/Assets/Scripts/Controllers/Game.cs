@@ -49,9 +49,9 @@ public class Game : ControllerHelper<IGame> {
 }
 
 public class GameController : IGame {
-	const string _getStateUrl = "{0}/api/game/state";
-	const string _getActionUrl = "{0}/api/game/action?version={1}";
-	const string _postActionUrl = "{0}/api/game/action?version={1}&type={2}";
+	const string _getStateUrl = "{0}/api/game/state?session={1}";
+	const string _getActionUrl = "{0}/api/game/action?session={1}&version={2}";
+	const string _postActionUrl = "{0}/api/game/action?session={1}&version={2}&type={3}";
 
 	BearerWebClient _updateClient = new BearerWebClient();
 	BearerWebClient _postClient = new BearerWebClient();
@@ -84,7 +84,7 @@ public class GameController : IGame {
 	}
 
 	public void Start() {
-		_updateClient.SendGetRequest(CardUrl.Prepare(_getStateUrl), onComplete: OnStartComplete);
+		_updateClient.SendGetRequest(CardUrl.Prepare(_getStateUrl, Sessions.CurrentSessionId), onComplete: OnStartComplete);
 	}
 
 	bool IsNeedToUpdate() {
@@ -93,7 +93,7 @@ public class GameController : IGame {
 
 	public void Update() {
 		if ( _ready && IsNeedToUpdate() ) {
-			_updateClient.SendGetRequest(CardUrl.Prepare(_getActionUrl, _state.Version.ToString()), onComplete: OnGetActionComplete);
+			_updateClient.SendGetRequest(CardUrl.Prepare(_getActionUrl, Sessions.CurrentSessionId, _state.Version.ToString()), onComplete: OnGetActionComplete);
 		}
 	}
 
@@ -145,7 +145,7 @@ public class GameController : IGame {
 		var version = _state.Version.ToString();
 		var actionName = action.GetType().FullName;
 		var json = JsonUtils.Serialize(action);
-		_postClient.SendJsonPostRequest(CardUrl.Prepare(_postActionUrl, version, actionName), json);
+		_postClient.SendJsonPostRequest(CardUrl.Prepare(_postActionUrl, Sessions.CurrentSessionId, version, actionName), json);
 	}
 }
 

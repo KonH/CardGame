@@ -37,10 +37,12 @@ public class SessionUI : MonoBehaviour {
 			return;
 		}
 		if ( sessions.Count > 0 ) {
-			View.gameObject.SetActive(true);
 			var firstSession = sessions.Where(s => s.Awaiting).FirstOrDefault();
 			if ( firstSession != null ) {
+				View.gameObject.SetActive(true);
 				View.Init(firstSession.Owner, firstSession.Users.Count, SessionRules.MaxUsersInSession, firstSession.Id);
+			} else {
+				View.gameObject.SetActive(false);
 			}
 		} else {
 			View.gameObject.SetActive(false);

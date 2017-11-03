@@ -17,7 +17,7 @@ public interface ISessionController : IController {
 }
 
 public class Sessions : ControllerHelper<ISessionController> {
-	public string CurrentSessionId {
+	public static string CurrentSessionId {
 		get {
 			if ( Instance != null ) {
 				return Instance.CurrentSessionId;
