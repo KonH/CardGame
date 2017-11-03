@@ -12,6 +12,7 @@ public interface IGame : IController {
 	void Update();
 	void ApplyAction<T>(T action) where T : IGameAction, new();
 	void ApplyTestAttack();
+	void NextTurn();
 }
 
 public class Game : ControllerHelper<IGame> {
@@ -36,6 +37,12 @@ public class Game : ControllerHelper<IGame> {
 	public static void ApplyTestAttack() {
 		if ( Instance != null ) {
 			Instance.ApplyTestAttack();
+		}
+	}
+
+	public static void NextTurn() {
+		if ( Instance != null ) {
+			Instance.NextTurn();
 		}
 	}
 }
@@ -113,6 +120,10 @@ public class GameController : IGame {
 	public void ApplyTestAttack() {
 		var action = new DamageAction(_state.Users.Find(u => u.Name != UDBase.Controllers.UserSystem.User.Name).Name, 1);
 		ApplyAction(action);
+	}
+
+	public void NextTurn() {
+		ApplyAction(new TurnAction());
 	}
 
 	public void ApplyAction<T>(T action) where T:IGameAction, new() {

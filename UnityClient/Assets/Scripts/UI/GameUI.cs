@@ -42,7 +42,11 @@ public class GameUI : MonoBehaviour {
 	void FullStateUpdate(GameState state) {
 		var users = state.Users;
 		foreach ( var user in users ) {
-			DrawUserState(user);
+			var active = user.Name == state.TurnOwner;
+			DrawUserState(user, active);
+			if ( user.Name == User.Name ) {
+				UpdateControlState(active);
+			}
 		}
 	}
 
@@ -53,14 +57,23 @@ public class GameUI : MonoBehaviour {
 		return Enemy;
 	}
 
-	void DrawUserState(UserState userState) {
+	void UpdateControlState(bool active) {
+		AttackButton.interactable = active;
+		TurnButton.interactable = active;
+	}
+
+	void DrawUserState(UserState userState, bool activeUser) {
 		var view = SelectView(userState);
-		view.NameText.text = userState.Name;
+		var nameText = userState.Name;
+		if ( activeUser ) {
+			nameText = string.Format("<b>{0}</b>", nameText);
+		}
+		view.NameText.text = nameText;
 		view.HPText.text = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
 	}
 
 	void OnTurn() {
-
+		Game.NextTurn();
 	}
 
 	void OnAttack() {
