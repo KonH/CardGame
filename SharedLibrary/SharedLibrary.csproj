@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actions\BaseGameAction.cs" />
+    <Compile Include="Actions\TurnAction.cs" />
     <Compile Include="Actions\DamageAction.cs" />
     <Compile Include="Actions\IGameAction.cs" />
+    <Compile Include="AI\GameAI.cs" />
     <Compile Include="Common\Interaction.cs" />
     <Compile Include="Common\SessionRules.cs" />
     <Compile Include="Common\GameStateExtensions.cs" />

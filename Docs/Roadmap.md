@@ -1,8 +1,8 @@
 # Gameplay basics
 
 - [x] Two users can play in one session
-- [ ] User can make actions at his turn
-- [ ] User can complete his turn (switch to other player turn)
+- [x] User can make actions at his turn
+- [x] User can complete his turn (switch to other player turn)
 - [ ] First turn - to random player
 - [ ] User has global, hand and table card sets
 - [ ] User has resources, its max count is increased every turn and restored

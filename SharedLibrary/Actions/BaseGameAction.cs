@@ -2,8 +2,10 @@
 
 namespace SharedLibrary.Actions {
 	public abstract class BaseGameAction : IGameAction {
+		public string User { get; set; }
+
 		public virtual bool CanApply(GameState state) {
-			return true;
+			return User == state.TurnOwner;
 		}
 
 		public abstract void Apply(GameState state);
