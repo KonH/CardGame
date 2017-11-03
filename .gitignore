@@ -4,3 +4,5 @@ Server/obj/
 SharedLibrary/bin/
 SharedLibrary/obj/
 Server/packages/
+SharedLibrary-Tests/bin/
+SharedLibrary-Tests/obj/
