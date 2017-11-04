@@ -114,9 +114,7 @@ namespace Server.Controllers {
 			if ( !string.IsNullOrEmpty(botUserName) ) {
 				gameBuilder.WithBot(botUserName);
 			}
-			if ( _games.TryAdd(gameBuilder.Build()) ) {
-				_logger.LogDebug("Game for session '{0}' is created (first turn to: '{1}')", session.Id, turnOwner);
-			} else {
+			if ( !_games.TryAdd(gameBuilder.Build()) ) {
 				_logger.LogError("Can't create game for session: '{0}'", session.Id);
 			}
 		}

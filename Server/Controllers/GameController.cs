@@ -23,17 +23,17 @@ namespace Server.Controllers {
 
 		[HttpGet("state")]
 		public IActionResult GetGameState(string session) {
-			// TODO: Filter user state
 			var state = _games.Find(session);
 			if ( state != null ) {
-				return Json(state.SharedState);
+				var userName = User.Identity.Name;
+				return Json(state.SharedState.Filter(userName));
 			}
 			return BadRequest("Can't find game");
 		}
 
 		IGameAction GetActionForVersion(ServerGameState state, int version) {
 			if ( state.Actions.Count > version ) {
-				return state.Actions[version];
+				return _games.FilterAction(state.Actions[version], User.Identity.Name);
 			}
 			return null;
 		}
@@ -64,8 +64,7 @@ namespace Server.Controllers {
 				if ( actionInstance != null ) {
 					lock ( state ) {
 						actionInstance.User = User.Identity.Name;
-						if ( state.SharedState.TryApply(actionInstance) ) {
-							_games.AddAction(state, actionInstance);
+						if ( _games.TryApplyAction(state, actionInstance) ) {
 							return Ok();
 						}
 					}

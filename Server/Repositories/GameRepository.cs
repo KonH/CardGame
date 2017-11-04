@@ -3,6 +3,8 @@ using Microsoft.Extensions.Logging;
 using SharedLibrary.Common;
 using SharedLibrary.Actions;
 using Server.Models;
+using System.Linq;
+using System;
 
 namespace Server.Repositories {
 	public class GameRepository {
@@ -21,12 +23,17 @@ namespace Server.Repositories {
 				return false;
 			}
 			try {
-				_games.TryAdd(game.Session, game);
-				TryAddBotAction(game);
-				return true;
-			} catch {
-				return false;
+				if ( _games.TryAdd(game.Session, game) ) {
+					_logger.LogDebug(
+						"Game for session '{0}' is created (first turn to: '{1}')", 
+						game.Session, game.SharedState.TurnOwner);
+					TryAddBotAction(game);
+					return true;
+				}
+			} catch (Exception e) {
+				_logger.LogWarning("TryAdd: {0}", e);
 			}
+			return false;
 		}
 
 		public ServerGameState Find(string session) {
@@ -38,26 +45,52 @@ namespace Server.Repositories {
 			return null;
 		}
 
-		public void TryAddBotAction(ServerGameState state) {
+		public bool TryApplyAction(ServerGameState state, IGameAction action) {
+			if ( state != null ) {
+				var gameState = state.SharedState;
+				if ( gameState.TryApply(action) ) {
+					AddAction(state, action);
+					return true;
+				}
+			}
+			return false;
+		}
+
+		void AddAction(ServerGameState state, IGameAction action) {
+			state.Actions.Add(action);
+			_logger.LogDebug(
+				"[{0}] User: '{1}', action: {2} (state v.{3})",
+				state.Session, action.User, action.ToString(), state.SharedState.Version);
+			var expandAction = action as IExpandCardAction;
+			if ( (expandAction != null) && (!string.IsNullOrEmpty(expandAction.ExpandUser)) ) {
+				state.SharedState.Version++;
+				var card = state.SharedState.Users.Find(u => u.Name == expandAction.ExpandUser).HandSet.Last();
+				_logger.LogDebug(
+					"[{0}] ExpandCardAction: user: '{1}' (hand: {2}), card: {3}", 
+					state.Session, expandAction.ExpandUser, expandAction.ExpandHand, card.Type);
+				state.Actions.Add(new ShowHandCardAction(expandAction.ExpandUser, card));
+			}
+			TryAddBotAction(state);
+		}
+
+		void TryAddBotAction(ServerGameState state) {
 			if ( (state != null) && (state.BotUser != null) ) {
 				var gameState = state.SharedState;
 				var botAction = state.BotUser.GetAction(gameState);
 				if ( botAction != null ) {
-					if ( gameState.TryApply(botAction) ) {
-						AddAction(state, botAction);
-					}
+					TryApplyAction(state, botAction);
 				}
 			}
 		}
 
-		public void AddAction(ServerGameState state, IGameAction action) {
-			if ( (state != null) && (action != null) ) {
-				state.Actions.Add(action);
-				_logger.LogDebug(
-					"[{0}] User: '{1}', action: {2} (state v.{3})",
-					state.Session, action.User, action.ToString(), state.SharedState.Version);
-				TryAddBotAction(state);
+		public IGameAction FilterAction(IGameAction action, string user) {
+			var limitedAction = action as ILimitedAction;
+			if ( limitedAction != null ) {
+				if ( user != limitedAction.LimitedUser ) {
+					return new EmptyAction();
+				}
 			}
+			return action;
 		}
 	}
 }
