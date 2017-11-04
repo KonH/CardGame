@@ -4,9 +4,9 @@
 - [x] User can make actions at his turn
 - [x] User can complete his turn (switch to other player turn)
 - [x] First turn - to random player
-- [ ] User has global, hand and table card sets
+- [x] User has global, hand and table card sets
 - [ ] User has resources, its max count is increased every turn and restored
-- [ ] Every turn user gets one card from global set to hand set (if hand set is not full)
+- [x] Every turn user gets one card from global set to hand set (if hand set is not full)
 - [ ] Every card has a price for usage
 - [ ] Card type: creature, usage - is sent to table set (with place selection)
 - [ ] Table set is limited

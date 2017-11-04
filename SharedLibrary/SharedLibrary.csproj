@@ -54,6 +54,8 @@
     <Compile Include="Common\SessionRules.cs" />
     <Compile Include="Common\GameStateExtensions.cs" />
     <Compile Include="Models\GameState.cs" />
+    <Compile Include="Models\Game\CardState.cs" />
+    <Compile Include="Models\Game\CardType.cs" />
     <Compile Include="Models\Game\UserState.cs" />
     <Compile Include="Models\Session.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
