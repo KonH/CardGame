@@ -6,3 +6,5 @@ SharedLibrary/obj/
 Server/packages/
 SharedLibrary-Tests/bin/
 SharedLibrary-Tests/obj/
+Server-Tests/bin/
+Server-Tests/obj/

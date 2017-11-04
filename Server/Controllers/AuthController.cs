@@ -21,6 +21,9 @@ namespace Server.Controllers {
 
 		[HttpGet("token")]
 		public IActionResult GetToken(string login, string password) {
+			if ( string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password) ) {
+				return BadRequest("Invalid login or password");
+			}
 			var identity = GetIdentity(login, password);
 			if ( identity == null ) {
 				return BadRequest("Invalid login or password");

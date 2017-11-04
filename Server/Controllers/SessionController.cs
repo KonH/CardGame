@@ -28,7 +28,7 @@ namespace Server.Controllers {
 			GameRepository games) 
 		{
 			_logger = logger;
-			_botPlay = bool.Parse(config["Simple-Bot"]);
+			_botPlay = config.GetValue("Simple-Bot", false);
 			_sessions = sessions;
 			_users = users;
 			_games = games;
