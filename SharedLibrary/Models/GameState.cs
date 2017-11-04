@@ -11,11 +11,16 @@ namespace SharedLibrary.Models {
 
 		public GameState() {}
 
-		public GameState(IEnumerable<UserState> users, string turnOwner) {
-			Users = new List<UserState>();
-			TurnOwner = turnOwner;
+		public GameState(IEnumerable<UserState> users, string turnOwner): this(turnOwner, 0, 0) {
 			SetupUsers(users);
 			PrepareStartSets();
+		}
+
+		GameState(string turnOwner, int version, int turn) {
+			TurnOwner = turnOwner;
+			Version = version;
+			Turn = turn;
+			Users = new List<UserState>();
 		}
 
 		void SetupUsers(IEnumerable<UserState> users) {
@@ -34,6 +39,26 @@ namespace SharedLibrary.Models {
 					user.TryGetCard();
 				}
 			}
+		}
+
+		List<CardState> HideCards(List<CardState> cards) {
+			var newCards = new List<CardState>();
+			for ( var i = 0; i < cards.Count; i++ ) {
+				newCards.Add(new CardState() { Type = CardType.Hidden });
+			}
+			return newCards;
+		}
+
+		public GameState Filter(string userName) {
+			var state = new GameState(TurnOwner, Version, Turn);
+			foreach ( var user in Users ) {
+				var table = user.TableSet;
+				var hand = user.Name == userName ? user.HandSet : HideCards(user.HandSet);
+				var global = HideCards(user.GlobalSet);
+				var newUser = new UserState(user.Name, user.Health, user.MaxHealth, table, hand, global);
+				state.Users.Add(newUser);
+			}
+			return state;
 		}
 	}
 }

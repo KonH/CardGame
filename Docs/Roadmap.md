@@ -10,8 +10,8 @@
 - [ ] Every card has a price for usage
 - [ ] Card type: creature, usage - is sent to table set (with place selection)
 - [ ] Table set is limited
-- [ ] Hand set is limited and invisible to other player
-- [ ] Global set is invisible to other player
+- [x] Hand set is limited and invisible to other player
+- [x] Global sets are invisible to any player
 - [ ] Creature has damage and health
 - [x] User has health
 - [ ] Every turn creature can attack other player's creature or player (except first turn after summon)

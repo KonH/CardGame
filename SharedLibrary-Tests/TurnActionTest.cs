@@ -14,7 +14,7 @@ namespace SharedLibrary_Tests {
 		[Fact]
 		public void UserCanChangeTurn() {
 			var state = Common.GameState;
-			var action = new TurnAction() { User = "1" };
+			var action = new TurnAction("1");
 			Assert.True(state.TryApply(action));
 			Assert.Same("2", state.TurnOwner);
 		}
@@ -23,10 +23,10 @@ namespace SharedLibrary_Tests {
 		public void TurnActionChangeTurnValue() {
 			var state = Common.GameState;
 			Assert.Equal(0, state.Turn);
-			var action = new TurnAction() { User = "1" };
+			var action = new TurnAction("1");
 			Assert.True(state.TryApply(action));
 			Assert.Equal(0, state.Turn);
-			action = new TurnAction() { User = "2" };
+			action = new TurnAction("2");
 			Assert.True(state.TryApply(action));
 			Assert.Equal(1, state.Turn);
 		}
@@ -34,7 +34,7 @@ namespace SharedLibrary_Tests {
 		[Fact]
 		public void WrongUserCantChangeTurn() {
 			var state = Common.GameState;
-			var action = new TurnAction() { User = "2" };
+			var action = new TurnAction("2");
 			Assert.False(state.TryApply(action));
 			Assert.Same("1", state.TurnOwner);
 		}

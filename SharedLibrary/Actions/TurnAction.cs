@@ -1,10 +1,16 @@
 ﻿using SharedLibrary.Common;
 using SharedLibrary.Models;
-using SharedLibrary.Models.Game;
 
 namespace SharedLibrary.Actions {
-	public class TurnAction : BaseGameAction {
+	public class TurnAction : BaseGameAction, IExpandCardAction {
+		public string ExpandUser { get; private set; }
+		public bool ExpandHand { get { return true; } }
+
 		public TurnAction() {}
+
+		public TurnAction(string user) {
+			User = user;
+		}
 
 		public override void Apply(GameState state) {
 			var user = state.Users.Find(u => u.Name != state.TurnOwner);
@@ -15,7 +21,10 @@ namespace SharedLibrary.Actions {
 				}
 				if ( state.Turn > 0 ) {
 					if ( user.HandSet.Count < GameRules.MaxHandSet ) {
-						user.TryGetCard();
+						var result = user.TryGetCard();
+						if ( result ) {
+							ExpandUser = user.Name;
+						}
 					}
 				}
 			}

@@ -11,7 +11,7 @@ namespace SharedLibrary.AI {
 
 		public IGameAction GetAction(GameState state) {
 			if ( state.TurnOwner == _userName ) {
-				return new TurnAction() { User = _userName };
+				return new TurnAction(_userName);
 			}
 			return null;
 		}

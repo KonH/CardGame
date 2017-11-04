@@ -18,13 +18,13 @@ namespace SharedLibrary_Tests {
 			var u1StartCount = u1hand.Count;
 			var u2StartCount = u2hand.Count;
 			// turn: u1, 0
-			state.TryApply(new TurnAction() { User = "1" });
+			state.TryApply(new TurnAction("1"));
 			// turn: u2, 0
 			Assert.Equal(u2StartCount, u2hand.Count);
-			state.TryApply(new TurnAction() { User = "2" });
+			state.TryApply(new TurnAction("2"));
 			// turn: u1, 1
 			Assert.Equal(u1StartCount + 1, u1hand.Count);
-			state.TryApply(new TurnAction() { User = "1" });
+			state.TryApply(new TurnAction("1"));
 			// turn: u2, 1
 			Assert.Equal(u2StartCount + 1, u2hand.Count);
 		}
@@ -34,7 +34,7 @@ namespace SharedLibrary_Tests {
 			var state = Common.GameState;
 			var turns = GameRules.MaxHandSet - GameRules.StartupHandSet + 1;
 			while ( state.Turn < turns ) {
-				state.TryApply(new TurnAction() { User = state.TurnOwner });
+				state.TryApply(new TurnAction(state.TurnOwner));
 				Assert.True(state.Users.TrueForAll(u => u.HandSet.Count <= GameRules.MaxHandSet));
 			}
 		}
