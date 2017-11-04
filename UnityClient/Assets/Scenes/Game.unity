@@ -342,6 +342,8 @@ MonoBehaviour:
   Enemy: {fileID: 758151375}
   TurnButton: {fileID: 2141249473}
   AttackButton: {fileID: 171549442}
+  CardPrefab: {fileID: 114072113341011488, guid: dac939a5771863d44abe265c7ae3b722,
+    type: 2}
 --- !u!1001 &758151374
 Prefab:
   m_ObjectHideFlags: 0

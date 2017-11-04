@@ -1,5 +1,6 @@
 ﻿using SharedLibrary.Models;
 using SharedLibrary.Models.Game;
+using System.Collections.Generic;
 using UDBase.Controllers.EventSystem;
 using UDBase.Controllers.UserSystem;
 using UnityEngine;
@@ -10,6 +11,7 @@ public class GameUI : MonoBehaviour {
 	public UserView Enemy;
 	public Button TurnButton;
 	public Button AttackButton;
+	public CardView CardPrefab;
 
 	void Awake() {
 		TurnButton.onClick.AddListener(OnTurn);
@@ -70,6 +72,30 @@ public class GameUI : MonoBehaviour {
 		}
 		view.NameText.text = nameText;
 		view.HPText.text = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
+
+		UpdateGlobalCount(userState.GlobalSet.Count, view.Global);
+		UpdateCards(userState.HandSet, view.Hand);
+		UpdateCards(userState.TableSet, view.Table);
+	}
+
+	void UpdateGlobalCount(int count, CardSet global) {
+		CardView globalCardView;
+		if ( global.Cards.Count == 0 ) {
+			globalCardView = ObjectPool.Spawn(CardPrefab);
+			global.Add(globalCardView);
+		} else {
+			globalCardView = global.Cards[0];
+		}
+		globalCardView.Init(count.ToString(), 0, 0, 0, 0);
+	}
+
+	void UpdateCards(List<CardState> cards, CardSet set) {
+		set.Clear();
+		foreach ( var card in cards ) {
+			var cardView = ObjectPool.Spawn(CardPrefab);
+			cardView.Init(card.Type.ToString(), 0, 0, 0, 0);
+			set.Add(cardView);
+		}
 	}
 
 	void OnTurn() {
