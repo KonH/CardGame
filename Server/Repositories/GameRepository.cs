@@ -61,16 +61,25 @@ namespace Server.Repositories {
 			_logger.LogDebug(
 				"[{0}] User: '{1}', action: {2} (state v.{3})",
 				state.Session, action.User, action.ToString(), state.SharedState.Version);
+			TryAddShowCardAction(state, action);
+			TryAddBotAction(state);
+		}
+
+		void TryAddShowCardAction(ServerGameState state, IGameAction action) {
 			var expandAction = action as IExpandCardAction;
 			if ( (expandAction != null) && (!string.IsNullOrEmpty(expandAction.ExpandUser)) ) {
 				state.SharedState.Version++;
 				var card = state.SharedState.Users.Find(u => u.Name == expandAction.ExpandUser).HandSet.Last();
 				_logger.LogDebug(
-					"[{0}] ExpandCardAction: user: '{1}' (hand: {2}), card: {3}", 
+					"[{0}] ExpandCardAction: user: '{1}' (hand: {2}), card: {3}",
 					state.Session, expandAction.ExpandUser, expandAction.ExpandHand, card.Type);
-				state.Actions.Add(new ShowHandCardAction(expandAction.ExpandUser, card));
+				if ( expandAction.ExpandHand ) {
+					state.Actions.Add(new ShowHandCardAction(expandAction.ExpandUser, card));
+				}
+				if ( expandAction.ExpandTable ) {
+					state.Actions.Add(new ShowTableCardAction(expandAction.ExpandUser, card));
+				}
 			}
-			TryAddBotAction(state);
 		}
 
 		void TryAddBotAction(ServerGameState state) {

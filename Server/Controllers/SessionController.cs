@@ -110,7 +110,8 @@ namespace Server.Controllers {
 			var turnOwnerIndex = rand.Next(session.Users.Count);
 			var turnOwner      = session.Users[turnOwnerIndex];
 			var gameBuilder = 
-				new GameBuilder(session.Id, session.Users, GameRules.DefaultHealth).WithTurnOwner(turnOwner);
+				new GameBuilder(session.Id, session.Users, GameRules.StartHealth, GameRules.StartPower)
+				.WithTurnOwner(turnOwner);
 			if ( !string.IsNullOrEmpty(botUserName) ) {
 				gameBuilder.WithBot(botUserName);
 			}

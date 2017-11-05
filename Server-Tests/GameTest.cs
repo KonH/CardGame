@@ -23,10 +23,10 @@ namespace Server.Tests {
 		}
 
 		[Fact]
-		public void NewCardIsVisible() {
+		public void NewHandCardIsVisible() {
 			var games       = Common.GetService<GameRepository>(_server);
 			var session     = "test";
-			var serverState = new GameBuilder(session, new string[] { "1", "2" }, 1).WithTurnOwner("1").Build();
+			var serverState = new GameBuilder(session, new string[] { "1", "2" }, 1, 1).WithTurnOwner("1").Build();
 			Assert.True(games.TryAdd(serverState));
 			var state1 = serverState.SharedState.Filter("1");
 			var state2 = serverState.SharedState.Filter("2");
@@ -43,6 +43,26 @@ namespace Server.Tests {
 
 			Assert.True(state2.Users.First(u => u.Name == "2").HandSet.TrueForAll(c => c.Type != CardType.Hidden));
 			Assert.True(state2.Users.First(u => u.Name == "1").HandSet.TrueForAll(c => c.Type == CardType.Hidden));
-		} 
+		}
+
+		[Fact]
+		public void NewTableCardIsVisible() {
+			var games       = Common.GetService<GameRepository>(_server);
+			var session     = "test";
+			var serverState = new GameBuilder(session, new string[] { "1", "2" }, 1, 1).WithTurnOwner("1").Build();
+			Assert.True(games.TryAdd(serverState));
+			var state1 = serverState.SharedState.Filter("1");
+			var state2 = serverState.SharedState.Filter("2");
+			var user   = serverState.SharedState.Users[0];
+			var card   = user.HandSet.Find(c => c.Price <= user.Power);
+			Assert.True(games.TryApplyAction(serverState, new BuyCreatureAction("1", user.HandSet.IndexOf(card), 0)));
+			foreach ( var action in serverState.Actions ) {
+				state1.TryApply(games.FilterAction(action, "1"));
+				state2.TryApply(games.FilterAction(action, "2"));
+			}
+
+			Assert.True(state1.Users.First(u => u.Name == "1").TableSet.TrueForAll(c => (c == null) || (c.Type != CardType.Hidden)));
+			Assert.True(state2.Users.First(u => u.Name == "2").TableSet.TrueForAll(c => (c == null) || (c.Type != CardType.Hidden)));
+		}
 	}
 }

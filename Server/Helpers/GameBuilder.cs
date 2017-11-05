@@ -13,9 +13,9 @@ namespace Server.Helpers {
 		string                 _turnOwner;
 		GameAI                 _bot;
 
-		public GameBuilder(string session, IEnumerable<string> users, int defaultHealth) {
+		public GameBuilder(string session, IEnumerable<string> users, int defaultHealth, int defaultPower) {
 			_session = session;
-			_users   = users.Select(name => new UserState(name, defaultHealth)).ToList();
+			_users   = users.Select(name => new UserState(name, defaultHealth, defaultPower)).ToList();
 		}
 
 		public GameBuilder WithTurnOwner(string userName) {
