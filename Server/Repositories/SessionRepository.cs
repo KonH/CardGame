@@ -1,6 +1,6 @@
-﻿using SharedLibrary.Models;
+﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using SharedLibrary.Models;
 
 namespace Server.Repositories {
 	public class SessionRepository {

@@ -2,11 +2,11 @@
 
 namespace SharedLibrary.Models.Game {
 	public class UserState {
-		public string Name { get; private set; }
-		public int Health { get; set; }
-		public int MaxHealth { get; private set; }
-		public List<CardState> TableSet { get; private set; }
-		public List<CardState> HandSet { get; private set; }
+		public string          Name      { get; private set; }
+		public int             Health    { get; set; }
+		public int             MaxHealth { get; private set; }
+		public List<CardState> TableSet  { get; private set; }
+		public List<CardState> HandSet   { get; private set; }
 		public List<CardState> GlobalSet { get; private set; }
 
 		public UserState(string name, int health) : 
@@ -18,18 +18,18 @@ namespace SharedLibrary.Models.Game {
 		}
 
 		public UserState(
-			string name,
-			int health,
-			int maxHealth,
+			string          name,
+			int             health,
+			int             maxHealth,
 			List<CardState> table,
 			List<CardState> hand,
 			List<CardState> global)
 		{
-			Name = name;
-			Health = health;
+			Name      = name;
+			Health    = health;
 			MaxHealth = maxHealth;
-			TableSet = table;
-			HandSet = hand;
+			TableSet  = table;
+			HandSet   = hand;
 			GlobalSet = global;
 		}
 

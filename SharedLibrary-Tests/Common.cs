@@ -1,7 +1,7 @@
-﻿using SharedLibrary.Common;
+﻿using System.Collections.Generic;
+using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Models.Game;
-using System.Collections.Generic;
 
 namespace SharedLibrary_Tests {
     static class Common {

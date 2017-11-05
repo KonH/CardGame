@@ -1,6 +1,6 @@
-﻿using SharedLibrary.Models.Game;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
+using SharedLibrary.Models.Game;
 using Xunit;
 
 namespace SharedLibrary_Tests {
@@ -15,11 +15,11 @@ namespace SharedLibrary_Tests {
 
 		[Fact]
 		public void GlobalSetIsInvisible() {
-			var state = Common.GameState;
-			var filteredState = state.Filter("1");
-			var user = state.Users.First(u => u.Name == "1");
-			var filteredUser = filteredState.Users.First(u => u.Name == "1");
-			var anotherUser = state.Users.First(u => u.Name != "1");
+			var state               = Common.GameState;
+			var filteredState       = state.Filter("1");
+			var user                = state.Users.First(u => u.Name == "1");
+			var filteredUser        = filteredState.Users.First(u => u.Name == "1");
+			var anotherUser         = state.Users.First(u => u.Name != "1");
 			var filteredAnotherUser = filteredState.Users.First(u => u.Name != "1");
 			Assert.Equal(user.GlobalSet.Count, filteredUser.GlobalSet.Count);
 			Assert.Equal(anotherUser.GlobalSet.Count, filteredAnotherUser.GlobalSet.Count);
@@ -29,11 +29,11 @@ namespace SharedLibrary_Tests {
 
 		[Fact]
 		public void HandSetIsInvisibleForOthers() {
-			var state = Common.GameState;
-			var filteredState = state.Filter("1");
-			var user = state.Users.First(u => u.Name == "1");
-			var filteredUser = filteredState.Users.First(u => u.Name == "1");
-			var anotherUser = state.Users.First(u => u.Name != "1");
+			var state               = Common.GameState;
+			var filteredState       = state.Filter("1");
+			var user                = state.Users.First(u => u.Name == "1");
+			var filteredUser        = filteredState.Users.First(u => u.Name == "1");
+			var anotherUser         = state.Users.First(u => u.Name != "1");
 			var filteredAnotherUser = filteredState.Users.First(u => u.Name != "1");
 			Assert.Equal(user.HandSet.Count, filteredUser.HandSet.Count);
 			Assert.Equal(anotherUser.HandSet.Count, filteredAnotherUser.HandSet.Count);

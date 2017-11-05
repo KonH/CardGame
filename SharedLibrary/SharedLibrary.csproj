@@ -44,14 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Actions\BaseGameAction.cs" />
+    <Compile Include="Actions\Base\BaseGameAction.cs" />
     <Compile Include="Actions\EmptyAction.cs" />
-    <Compile Include="Actions\ILimitedAction.cs" />
+    <Compile Include="Actions\Base\ILimitedAction.cs" />
     <Compile Include="Actions\ShowHandCardAction.cs" />
-    <Compile Include="Actions\IExpandCardAction.cs" />
+    <Compile Include="Actions\Base\IExpandCardAction.cs" />
     <Compile Include="Actions\TurnAction.cs" />
     <Compile Include="Actions\DamageAction.cs" />
-    <Compile Include="Actions\IGameAction.cs" />
+    <Compile Include="Actions\Base\IGameAction.cs" />
     <Compile Include="AI\GameAI.cs" />
     <Compile Include="Common\Interaction.cs" />
     <Compile Include="Common\GameRules.cs" />

@@ -3,13 +3,13 @@
 namespace SharedLibrary.Actions {
 	public class DamageAction : BaseGameAction {
 		public string VictimUser;
-		public int Count;
+		public int    Count;
 
 		public DamageAction() {}
 
 		public DamageAction(string victimUser, int count) {
 			VictimUser = victimUser;
-			Count = count;
+			Count      = count;
 		}
 
 		public override void Apply(GameState state) {

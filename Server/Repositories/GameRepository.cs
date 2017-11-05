@@ -1,14 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Linq;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using SharedLibrary.Common;
 using SharedLibrary.Actions;
 using Server.Models;
-using System.Linq;
-using System;
 
 namespace Server.Repositories {
 	public class GameRepository {
-		ILogger _logger;
+		ILogger                                       _logger;
 		ConcurrentDictionary<string, ServerGameState> _games = new ConcurrentDictionary<string, ServerGameState>();
 
 		public GameRepository(ILogger<GameRepository> logger) {

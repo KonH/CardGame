@@ -1,5 +1,5 @@
-﻿using SharedLibrary.Actions;
-using SharedLibrary.Models;
+﻿using SharedLibrary.Models;
+using SharedLibrary.Actions;
 
 namespace SharedLibrary.AI {
 	public class GameAI {

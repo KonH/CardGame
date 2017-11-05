@@ -1,6 +1,6 @@
-﻿using UDBase.Controllers.EventSystem;
+﻿using UDBase.Utils;
 using UDBase.Controllers.LogSystem;
-using UDBase.Utils;
+using UDBase.Controllers.EventSystem;
 
 public class BearerWebClient : WebClient {
 	public void Init() {

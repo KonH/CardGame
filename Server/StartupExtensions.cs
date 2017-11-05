@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Server.Repositories;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Server.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Server {
 	public static class StartupExtensions {
@@ -24,12 +24,12 @@ namespace Server {
 				.AddJwtBearer(options => {
 					options.RequireHttpsMetadata = false;
 					options.TokenValidationParameters = new TokenValidationParameters {
-						ValidateIssuer = true,
-						ValidIssuer = AuthSettings.Issuer,
-						ValidateAudience = true,
-						ValidAudience = AuthSettings.Audience,
-						ValidateLifetime = true,
-						IssuerSigningKey = AuthSettings.GetSymmetricSecurityKey(),
+						ValidateIssuer           = true,
+						ValidIssuer              = AuthSettings.Issuer,
+						ValidateAudience         = true,
+						ValidAudience            = AuthSettings.Audience,
+						ValidateLifetime         = true,
+						IssuerSigningKey         = AuthSettings.GetSymmetricSecurityKey(),
 						ValidateIssuerSigningKey = true
 					};
 				}

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using SharedLibrary.Models.Game;
 using SharedLibrary.Common;
+using SharedLibrary.Models.Game;
 
 namespace SharedLibrary.Models {
 	public class GameState {
-		public string TurnOwner { get; set; }
-		public int Version { get; set; }
-		public int Turn { get; set; }
-		public List<UserState> Users { get; private set; }
+		public string          TurnOwner { get; set; }
+		public int             Version   { get; set; }
+		public int             Turn      { get; set; }
+		public List<UserState> Users     { get; private set; }
 
 		public GameState() {}
 
@@ -18,9 +18,9 @@ namespace SharedLibrary.Models {
 
 		GameState(string turnOwner, int version, int turn) {
 			TurnOwner = turnOwner;
-			Version = version;
-			Turn = turn;
-			Users = new List<UserState>();
+			Version   = version;
+			Turn      = turn;
+			Users     = new List<UserState>();
 		}
 
 		void SetupUsers(IEnumerable<UserState> users) {
@@ -52,9 +52,9 @@ namespace SharedLibrary.Models {
 		public GameState Filter(string userName) {
 			var state = new GameState(TurnOwner, Version, Turn);
 			foreach ( var user in Users ) {
-				var table = user.TableSet;
-				var hand = user.Name == userName ? user.HandSet : HideCards(user.HandSet);
-				var global = HideCards(user.GlobalSet);
+				var table   = user.TableSet;
+				var hand    = user.Name == userName ? user.HandSet : HideCards(user.HandSet);
+				var global  = HideCards(user.GlobalSet);
 				var newUser = new UserState(user.Name, user.Health, user.MaxHealth, table, hand, global);
 				state.Users.Add(newUser);
 			}

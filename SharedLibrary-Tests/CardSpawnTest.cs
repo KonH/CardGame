@@ -1,5 +1,5 @@
-﻿using SharedLibrary.Actions;
-using SharedLibrary.Common;
+﻿using SharedLibrary.Common;
+using SharedLibrary.Actions;
 using Xunit;
 
 namespace SharedLibrary_Tests {
@@ -12,9 +12,9 @@ namespace SharedLibrary_Tests {
 
 		[Fact]
 		public void CardAddedOnNextTurn() {
-			var state = Common.GameState;
-			var u1hand = state.Users[0].HandSet;
-			var u2hand = state.Users[1].HandSet;
+			var state        = Common.GameState;
+			var u1hand       = state.Users[0].HandSet;
+			var u2hand       = state.Users[1].HandSet;
 			var u1StartCount = u1hand.Count;
 			var u2StartCount = u2hand.Count;
 			// turn: u1, 0

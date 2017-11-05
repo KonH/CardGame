@@ -1,11 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System.Text;
+﻿using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Server {
 	public class AuthSettings {
-		public const string Issuer = "CardServer";
+		public const string Issuer   = "CardServer";
 		public const string Audience = "CardClient";
-		public const int Lifetime = 60;
+		public const int   Lifetime  = 60;
+
 		const string Key = "wof7YIoqBlKdpXLJ";
 
 		public static SymmetricSecurityKey GetSymmetricSecurityKey() {

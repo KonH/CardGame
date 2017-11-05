@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+﻿using SharedLibrary.Utils;
 using SharedLibrary.Common;
 using SharedLibrary.Actions;
-using SharedLibrary.Utils;
-using Server.Repositories;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Server.Models;
+using Server.Repositories;
+using Newtonsoft.Json.Linq;
 
 namespace Server.Controllers {
 	[Authorize]
 	[Produces("application/json")]
 	[Route("api/game")]
 	public class GameController : Controller {
-		ILogger _logger;
+		ILogger        _logger;
 		GameRepository _games;
 
 		public GameController(GameRepository games, ILogger<GameController> logger) {
-			_games = games;
+			_games  = games;
 			_logger = logger;
 		}
 

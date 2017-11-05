@@ -1,15 +1,15 @@
-﻿using FullSerializer;
-using System;
-using UDBase.Controllers;
-using UDBase.Controllers.EventSystem;
-using UDBase.Controllers.LogSystem;
-using UDBase.Controllers.UserSystem;
+﻿using System;
 using UDBase.Utils;
 using UDBase.Utils.Json;
+using UDBase.Controllers;
+using UDBase.Controllers.LogSystem;
+using UDBase.Controllers.UserSystem;
+using UDBase.Controllers.EventSystem;
+using FullSerializer;
 
 public interface IAuthController : IController {
-	string Login { get; }
-	string Password { get; }
+	string Login      { get; }
+	string Password   { get; }
 	string AuthHeader { get; }
 	void TryLogin(string login, string password, Action<bool, string> onComplete);
 }
@@ -52,7 +52,7 @@ public class Auth : ControllerHelper<IAuthController> {
 class AuthController : IAuthController {
 	class Jwtoken {
 		[fsProperty("token")]
-		public string Token = "";
+		public string Token    = "";
 		[fsProperty("userName")]
 		public string UserName = "";
 	}
@@ -109,7 +109,7 @@ class AuthController : IAuthController {
 	}
 
 	public void TryLogin(string login, string password, Action<bool, string> onComplete) {
-		Login = login;
+		Login    = login;
 		Password = password;
 		Log.MessageFormat("TryLogin: login: '{0}', password: '{1}'", LogTags.Auth, login, password);
 		if ( !_client.InProgress ) {

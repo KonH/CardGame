@@ -1,7 +1,7 @@
-using Xunit;
 using SharedLibrary.Common;
-using SharedLibrary.Actions;
 using SharedLibrary.Models;
+using SharedLibrary.Actions;
+using Xunit;
 
 namespace SharedLibrary_Tests {
 	public class TurnActionTest {
@@ -13,7 +13,7 @@ namespace SharedLibrary_Tests {
 
 		[Fact]
 		public void UserCanChangeTurn() {
-			var state = Common.GameState;
+			var state  = Common.GameState;
 			var action = new TurnAction("1");
 			Assert.True(state.TryApply(action));
 			Assert.Same("2", state.TurnOwner);
@@ -33,7 +33,7 @@ namespace SharedLibrary_Tests {
 
 		[Fact]
 		public void WrongUserCantChangeTurn() {
-			var state = Common.GameState;
+			var state  = Common.GameState;
 			var action = new TurnAction("2");
 			Assert.False(state.TryApply(action));
 			Assert.Same("1", state.TurnOwner);

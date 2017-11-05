@@ -4,7 +4,7 @@ using SharedLibrary.Models;
 namespace SharedLibrary.Actions {
 	public class TurnAction : BaseGameAction, IExpandCardAction {
 		public string ExpandUser { get; private set; }
-		public bool ExpandHand { get { return true; } }
+		public bool ExpandHand   { get { return true; } }
 
 		public TurnAction() {}
 

@@ -1,6 +1,6 @@
-﻿using Server.Models;
+﻿using System.Collections.Generic;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using Server.Models;
 
 namespace Server.Repositories {
 	public class InMemoryUserRepository : IUserRepository {

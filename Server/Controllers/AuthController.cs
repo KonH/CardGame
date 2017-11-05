@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -12,10 +12,10 @@ namespace Server.Controllers {
 	[Route("api/auth")]
 	public class AuthController : Controller {
 		IUserRepository _users;
-		ILogger _logger;
+		ILogger         _logger;
 
 		public AuthController(IUserRepository users, ILogger<AuthController> logger) {
-			_users = users;
+			_users  = users;
 			_logger = logger;
 		}
 
@@ -31,16 +31,16 @@ namespace Server.Controllers {
 
 			var now = DateTime.UtcNow;
 			var jwt = new JwtSecurityToken(
-					issuer: AuthSettings.Issuer,
-					audience: AuthSettings.Audience,
-					notBefore: now,
-					claims: identity.Claims,
-					expires: now.Add(TimeSpan.FromMinutes(AuthSettings.Lifetime)),
+					issuer            : AuthSettings.Issuer,
+					audience          : AuthSettings.Audience,
+					notBefore         : now,
+					claims            : identity.Claims,
+					expires           : now.Add(TimeSpan.FromMinutes(AuthSettings.Lifetime)),
 					signingCredentials: new SigningCredentials(AuthSettings.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 			var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
 			var response = new {
-				token = encodedJwt,
+				token    = encodedJwt,
 				userName = identity.Name
 			};
 			_logger.LogDebug("User is logged in: '{0}'", identity.Name);

@@ -1,31 +1,31 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
-using Server.Repositories;
-using Server.Helpers;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
+using Server.Helpers;
+using Server.Repositories;
 
 namespace Server.Controllers {
 	[Authorize]
 	[Produces("application/json")]
 	[Route("api/session")]
 	public class SessionController : Controller {
-		ILogger _logger;
-		bool _botPlay;
+		ILogger           _logger;
+		bool              _botPlay;
 		SessionRepository _sessions;
-		IUserRepository _users;
-		GameRepository _games;
+		IUserRepository   _users;
+		GameRepository    _games;
 
 		public SessionController(
 			ILogger<SessionController> logger,
-			IConfiguration config,
-			SessionRepository sessions,
-			IUserRepository users,
-			GameRepository games) 
+			IConfiguration             config,
+			SessionRepository          sessions,
+			IUserRepository            users,
+			GameRepository             games) 
 		{
 			_logger = logger;
 			_botPlay = config.GetValue("Simple-Bot", false);
@@ -41,7 +41,7 @@ namespace Server.Controllers {
 
 		[HttpPost]
 		public IActionResult Create() {
-			var id = Guid.NewGuid().ToString();
+			var id      = Guid.NewGuid().ToString();
 			var creator = User.Identity.Name;
 			var session = new Session(id, creator);
 			if ( _sessions.TryAdd(session) ) {
@@ -106,9 +106,9 @@ namespace Server.Controllers {
 			if ( session.Awaiting ) {
 				return;
 			}
-			var rand = new Random(DateTime.Now.Millisecond);
+			var rand           = new Random(DateTime.Now.Millisecond);
 			var turnOwnerIndex = rand.Next(session.Users.Count);
-			var turnOwner = session.Users[turnOwnerIndex];
+			var turnOwner      = session.Users[turnOwnerIndex];
 			var gameBuilder = 
 				new GameBuilder(session.Id, session.Users, GameRules.DefaultHealth).WithTurnOwner(turnOwner);
 			if ( !string.IsNullOrEmpty(botUserName) ) {

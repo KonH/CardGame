@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using SharedLibrary.Common;
-using SharedLibrary.Models;
+﻿using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 using UDBase.Controllers.SceneSystem;
 using UDBase.Controllers.EventSystem;
+using SharedLibrary.Common;
+using SharedLibrary.Models;
 
 public class SessionUI : MonoBehaviour {
 	public SessionView View;
-	public Button CreateButton;
-	public Button CloseButton;
+	public Button      CreateButton;
+	public Button      CloseButton;
 
 	float _lastTime;
 	float _updateInterval = 3;

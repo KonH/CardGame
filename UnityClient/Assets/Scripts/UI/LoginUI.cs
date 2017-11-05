@@ -6,8 +6,8 @@ using UDBase.Controllers.SceneSystem;
 public class LoginUI : MonoBehaviour {
 	public InputField LoginField;
 	public InputField PasswordField;
-	public Button LoginButton;
-	public Text ResultText;
+	public Button     LoginButton;
+	public Text       ResultText;
 
 	void Start () {
 		LoginButton.onClick.AddListener(TryLogin);
@@ -15,14 +15,14 @@ public class LoginUI : MonoBehaviour {
 	}
 
 	void SetupCredentials() {
-		var login = TextUtils.EnsureString(Auth.Login);
-		LoginField.text = login;
-		var password = TextUtils.EnsureString(Auth.Password);
+		var login          = TextUtils.EnsureString(Auth.Login);
+		LoginField.text    = login;
+		var password       = TextUtils.EnsureString(Auth.Password);
 		PasswordField.text = password;
 	}
 
 	void TryLogin() {
-		var login = LoginField.text;
+		var login    = LoginField.text;
 		var password = PasswordField.text;
 		Auth.TryLogin(login, password, OnAuthComplete);
 	}

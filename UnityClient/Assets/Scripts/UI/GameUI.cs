@@ -1,31 +1,31 @@
-﻿using SharedLibrary.Models;
-using SharedLibrary.Models.Game;
-using System.Collections.Generic;
-using UDBase.Controllers.EventSystem;
-using UDBase.Controllers.UserSystem;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UDBase.Controllers.UserSystem;
+using UDBase.Controllers.EventSystem;
+using SharedLibrary.Models;
+using SharedLibrary.Models.Game;
 
 public class GameUI : MonoBehaviour {
 	public UserView Player;
 	public UserView Enemy;
-	public Button TurnButton;
-	public Button AttackButton;
+	public Button   TurnButton;
+	public Button   AttackButton;
 	public CardView CardPrefab;
 
 	void Awake() {
-		TurnButton.onClick.AddListener(OnTurn);
+		TurnButton  .onClick.AddListener(OnTurn);
 		AttackButton.onClick.AddListener(OnAttack);
 	}
 
 	void Start() {
-		Events.Subscribe<Game_Init>(this, OnGameInit);
+		Events.Subscribe<Game_Init>  (this, OnGameInit);
 		Events.Subscribe<Game_Reload>(this, OnGameReload);
 		Game.Start();
 	}
 
 	void OnDestroy() {
-		Events.Unsubscribe<Game_Init>(OnGameInit);
+		Events.Unsubscribe<Game_Init>  (OnGameInit);
 		Events.Unsubscribe<Game_Reload>(OnGameReload);
 	}
 
@@ -61,17 +61,17 @@ public class GameUI : MonoBehaviour {
 
 	void UpdateControlState(bool active) {
 		AttackButton.interactable = active;
-		TurnButton.interactable = active;
+		TurnButton.interactable   = active;
 	}
 
 	void DrawUserState(UserState userState, bool activeUser) {
-		var view = SelectView(userState);
+		var view     = SelectView(userState);
 		var nameText = userState.Name;
 		if ( activeUser ) {
 			nameText = string.Format("<b>{0}</b>", nameText);
 		}
 		view.NameText.text = nameText;
-		view.HPText.text = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
+		view.HPText.text   = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
 
 		UpdateGlobalCount(userState.GlobalSet.Count, view.Global);
 		UpdateCards(userState.HandSet, view.Hand);

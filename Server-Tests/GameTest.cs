@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System.Linq;
+using System.Net.Http;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using SharedLibrary.Common;
+using SharedLibrary.Actions;
+using SharedLibrary.Models.Game;
 using Server.Helpers;
 using Server.Repositories;
-using SharedLibrary.Actions;
-using SharedLibrary.Common;
-using SharedLibrary.Models.Game;
-using System.Linq;
-using System.Net.Http;
 using Xunit;
 
 namespace Server.Tests {
@@ -24,8 +24,8 @@ namespace Server.Tests {
 
 		[Fact]
 		public void NewCardIsVisible() {
-			var games = Common.GetService<GameRepository>(_server);
-			var session = "test";
+			var games       = Common.GetService<GameRepository>(_server);
+			var session     = "test";
 			var serverState = new GameBuilder(session, new string[] { "1", "2" }, 1).WithTurnOwner("1").Build();
 			Assert.True(games.TryAdd(serverState));
 			var state1 = serverState.SharedState.Filter("1");

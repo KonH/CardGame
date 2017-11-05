@@ -1,7 +1,7 @@
-﻿using SharedLibrary.Actions;
+﻿using System.Collections.Generic;
 using SharedLibrary.Models;
+using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
-using System.Collections.Generic;
 
 namespace SharedLibrary.Common {
 	public static class GameStateExtensions {

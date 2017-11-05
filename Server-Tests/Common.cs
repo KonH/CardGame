@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json.Linq;
-using Server.Models;
-using Server.Repositories;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.TestHost;
+using Server.Models;
+using Server.Repositories;
+using Newtonsoft.Json.Linq;
 
 namespace Server.Tests {
 	public static class Common {
-		public const string AuthTokenPath = "api/auth/token";
+		public const string AuthTokenPath         = "api/auth/token";
 		public const string AuthTokenPathWithArgs = "api/auth/token?login={0}&password={1}";
 
 		public static async Task<string> GetAuthToken(HttpClient client, User user) {
-			var login = user.Login;
-			var password = user.Password;
+			var login         = user.Login;
+			var password      = user.Password;
 			var loginResponse = await client.GetAsync(string.Format(AuthTokenPathWithArgs, login, password));
 			loginResponse.EnsureSuccessStatusCode();
 			var responseText = await loginResponse.Content.ReadAsStringAsync();
@@ -37,7 +37,7 @@ namespace Server.Tests {
 		}
 
 		public static async Task AuthorizeClient(TestServer server, HttpClient client, string userName) {
-			var user = FindUsers(server).First(u => u.Name == userName);
+			var user  = FindUsers(server).First(u => u.Name == userName);
 			var token = await GetAuthToken(client, user);
 			AddToken(client, token);
 		} 

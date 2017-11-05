@@ -1,9 +1,9 @@
-﻿using Server.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Server.Models;
 
 namespace Server.Repositories {
 	public interface IUserRepository {
-		User Find(string login, string password);
 		IEnumerable<User> All { get; }
+		User Find(string login, string password);
 	}
 }

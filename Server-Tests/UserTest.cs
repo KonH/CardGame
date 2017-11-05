@@ -1,5 +1,5 @@
-﻿using Server.Repositories;
-using System.Linq;
+﻿using System.Linq;
+using Server.Repositories;
 using Xunit;
 
 namespace Server.Tests {

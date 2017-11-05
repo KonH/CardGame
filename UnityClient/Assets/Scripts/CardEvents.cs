@@ -1,5 +1,5 @@
-﻿using SharedLibrary.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SharedLibrary.Models;
 
 public struct Auth_UpdateHeader {
 	public string AuthHeader { get; private set; }

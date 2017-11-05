@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
-using UDBase.Controllers;
 using UDBase.Utils;
-using UDBase.Controllers.LogSystem;
-using UDBase.Controllers.EventSystem;
-using UDBase.Controllers.UserSystem;
 using UDBase.Utils.Json;
+using UDBase.Controllers;
+using UDBase.Controllers.LogSystem;
+using UDBase.Controllers.UserSystem;
+using UDBase.Controllers.EventSystem;
 using SharedLibrary.Models;
 
 public interface ISessionController : IController {
@@ -52,8 +52,8 @@ public class Sessions : ControllerHelper<ISessionController> {
 
 public class SessionController : ISessionController {
 	const string _refreshUrl = "{0}/api/session";
-	const string _createUrl = "{0}/api/session";
-	const string _closeUrl = "{0}/api/session/{1}";
+	const string _createUrl  = "{0}/api/session";
+	const string _closeUrl   = "{0}/api/session/{1}";
 	const string _connectUrl = "{0}/api/session/connect/{1}";
 
 	public string CurrentSessionId { get; private set; }

@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
-using UDBase.Controllers;
-using UDBase.Controllers.EventSystem;
 using UDBase.Utils;
 using UDBase.Utils.Json;
-using SharedLibrary.Common;
-using SharedLibrary.Actions;
-using SharedLibrary.Models;
+using UDBase.Controllers;
+using UDBase.Controllers.EventSystem;
 using SharedLibrary.Utils;
+using SharedLibrary.Common;
+using SharedLibrary.Models;
+using SharedLibrary.Actions;
 
 public interface IGame : IController {
 	void Start();
@@ -49,16 +49,16 @@ public class Game : ControllerHelper<IGame> {
 }
 
 public class GameController : IGame {
-	const string _getStateUrl = "{0}/api/game/state?session={1}";
-	const string _getActionUrl = "{0}/api/game/action?session={1}&version={2}";
+	const string _getStateUrl   = "{0}/api/game/state?session={1}";
+	const string _getActionUrl  = "{0}/api/game/action?session={1}&version={2}";
 	const string _postActionUrl = "{0}/api/game/action?session={1}&version={2}&type={3}";
 
 	BearerWebClient _updateClient = new BearerWebClient();
 	BearerWebClient _postClient = new BearerWebClient();
-	GameState _state;
-	float _updateInterval;
+	GameState       _state;
+	float           _updateInterval;
 
-	bool _ready;
+	bool  _ready;
 	float _lastUpdateTime;
 
 	bool IsBusy {
@@ -73,14 +73,14 @@ public class GameController : IGame {
 
 	public void Init() {
 		_updateClient.Init();
-		_postClient.Init();
+		_postClient  .Init();
 	}
 
 	public void PostInit() {}
 
 	public void Reset() {
-		_updateClient.Init();
-		_postClient.Reset();
+		_updateClient.Reset();
+		_postClient  .Reset();
 	}
 
 	public void Start() {
@@ -93,7 +93,8 @@ public class GameController : IGame {
 
 	public void Update() {
 		if ( _ready && IsNeedToUpdate() ) {
-			_updateClient.SendGetRequest(CardUrl.Prepare(_getActionUrl, Sessions.CurrentSessionId, _state.Version.ToString()), onComplete: OnGetActionComplete);
+			var url = CardUrl.Prepare(_getActionUrl, Sessions.CurrentSessionId, _state.Version.ToString());
+			_updateClient.SendGetRequest(url, onComplete: OnGetActionComplete);
 		}
 	}
 
@@ -142,9 +143,9 @@ public class GameController : IGame {
 		if ( IsBusy ) {
 			return;
 		}
-		var version = _state.Version.ToString();
+		var version    = _state.Version.ToString();
 		var actionName = action.GetType().FullName;
-		var json = JsonUtils.Serialize(action);
+		var json       = JsonUtils.Serialize(action);
 		_postClient.SendJsonPostRequest(CardUrl.Prepare(_postActionUrl, Sessions.CurrentSessionId, version, actionName), json);
 	}
 }

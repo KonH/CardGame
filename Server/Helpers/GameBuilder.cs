@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Server.Models;
+using SharedLibrary.AI;
 using SharedLibrary.Models;
 using SharedLibrary.Models.Game;
-using SharedLibrary.AI;
+using Server.Models;
 
 namespace Server.Helpers {
 	public class GameBuilder {
-		string _session;
+		string                 _session;
 		IEnumerable<UserState> _users;
-		string _turnOwner;
-		GameAI _bot;
+		string                 _turnOwner;
+		GameAI                 _bot;
 
 		public GameBuilder(string session, IEnumerable<string> users, int defaultHealth) {
 			_session = session;
-			_users = users.Select(name => new UserState(name, defaultHealth)).ToList();
+			_users   = users.Select(name => new UserState(name, defaultHealth)).ToList();
 		}
 
 		public GameBuilder WithTurnOwner(string userName) {
@@ -35,7 +35,7 @@ namespace Server.Helpers {
 		}
 
 		public ServerGameState Build() {
-			var gameState = new GameState(_users, _turnOwner);
+			var gameState       = new GameState(_users, _turnOwner);
 			var serverGameState = new ServerGameState(_session, gameState, _bot);
 			return serverGameState;
 		}
