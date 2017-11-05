@@ -1,24 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UDBase.Controllers.UserSystem;
 using UDBase.Controllers.EventSystem;
 using SharedLibrary.Models;
+using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
 
 public class GameUI : MonoBehaviour {
 	public UserView Player;
 	public UserView Enemy;
 	public Button   TurnButton;
-	public Button   AttackButton;
 	public CardView CardPrefab;
 
+	int _selectedHandIndex;
+
 	void Awake() {
-		TurnButton  .onClick.AddListener(OnTurn);
-		AttackButton.onClick.AddListener(OnAttack);
+		TurnButton.onClick.AddListener(OnTurn);
 	}
 
 	void Start() {
+		Player.Hand.Init(OnPlayerHandCardClick);
+		Player.Table.Init(OnPlayerTableCardClick);
+
 		Events.Subscribe<Game_Init>  (this, OnGameInit);
 		Events.Subscribe<Game_Reload>(this, OnGameReload);
 		Game.Start();
@@ -60,8 +65,7 @@ public class GameUI : MonoBehaviour {
 	}
 
 	void UpdateControlState(bool active) {
-		AttackButton.interactable = active;
-		TurnButton.interactable   = active;
+		TurnButton.interactable = active;
 	}
 
 	void DrawUserState(UserState userState, bool activeUser) {
@@ -70,12 +74,13 @@ public class GameUI : MonoBehaviour {
 		if ( activeUser ) {
 			nameText = string.Format("<b>{0}</b>", nameText);
 		}
-		view.NameText.text = nameText;
-		view.HPText.text   = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
+		view.NameText.text  = nameText;
+		view.HPText.text    = string.Format("HP: {0}/{1}", userState.Health, userState.MaxHealth);
+		view.PowerText.text = string.Format("PW: {0}/{1}", userState.Power, userState.MaxPower);
 
 		UpdateGlobalCount(userState.GlobalSet.Count, view.Global);
-		UpdateCards(userState.HandSet, view.Hand);
-		UpdateCards(userState.TableSet, view.Table);
+		UpdateCards(userState.HandSet, view.Hand, (card) => activeUser && Game.CanBought(card));
+		UpdateCards(userState.TableSet, view.Table, (card) => false);
 	}
 
 	void UpdateGlobalCount(int count, CardSet global) {
@@ -86,14 +91,20 @@ public class GameUI : MonoBehaviour {
 		} else {
 			globalCardView = global.Cards[0];
 		}
-		globalCardView.Init(count.ToString(), 0, 0, 0, 0);
+		globalCardView.Init(true, false, count.ToString(), 0, 0, 0, 0);
 	}
 
-	void UpdateCards(List<CardState> cards, CardSet set) {
+	void UpdateCards(List<CardState> cards, CardSet set, Func<CardState, bool> interactable) {
 		set.Clear();
-		foreach ( var card in cards ) {
+		for ( var i = 0; i < cards.Count; i++ ) {
+			var card = cards[i];
 			var cardView = ObjectPool.Spawn(CardPrefab);
-			cardView.Init(card.Type.ToString(), 0, 0, 0, 0);
+			var interactableState = (interactable != null) && interactable(card);
+			if ( card == null ) {
+				cardView.InitPlaceholder(interactableState);
+			} else {
+				cardView.Init(true, interactableState, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth);
+			}
 			set.Add(cardView);
 		}
 	}
@@ -102,7 +113,16 @@ public class GameUI : MonoBehaviour {
 		Game.NextTurn();
 	}
 
-	void OnAttack() {
-		Game.ApplyTestAttack();
+	void OnPlayerHandCardClick(int index) {
+		_selectedHandIndex = index;
+		var userState = Game.GetCurrentUserState();
+		UpdateCards(userState.TableSet, Player.Table, (card) => card == null);
+	}
+
+	void OnPlayerTableCardClick(int index) {
+		var userState = Game.GetCurrentUserState();
+		UpdateCards(userState.TableSet, Player.Table, (card) => false);
+		var action = new BuyCreatureAction("", _selectedHandIndex, index);
+		Game.ApplyAction(action);
 	}
 }

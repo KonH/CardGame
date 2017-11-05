@@ -2,18 +2,21 @@
 using UDBase.Utils;
 using UDBase.Utils.Json;
 using UDBase.Controllers;
+using UDBase.Controllers.UserSystem;
 using UDBase.Controllers.EventSystem;
 using SharedLibrary.Utils;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Actions;
+using SharedLibrary.Models.Game;
 
 public interface IGame : IController {
 	void Start();
 	void Update();
 	void ApplyAction<T>(T action) where T : IGameAction, new();
-	void ApplyTestAttack();
 	void NextTurn();
+	bool CanBought(CardState card);
+	UserState GetCurrentUserState();
 }
 
 public class Game : ControllerHelper<IGame> {
@@ -35,16 +38,24 @@ public class Game : ControllerHelper<IGame> {
 		}
 	}
 
-	public static void ApplyTestAttack() {
-		if ( Instance != null ) {
-			Instance.ApplyTestAttack();
-		}
-	}
-
 	public static void NextTurn() {
 		if ( Instance != null ) {
 			Instance.NextTurn();
 		}
+	}
+
+	public static bool CanBought(CardState card) {
+		if ( Instance != null ) {
+			return Instance.CanBought(card);
+		}
+		return false;
+	}
+
+	public static UserState GetCurrentUserState() {
+		if ( Instance != null ) {
+			return Instance.GetCurrentUserState();
+		}
+		return null;
 	}
 }
 
@@ -130,11 +141,6 @@ public class GameController : IGame {
 		}
 	}
 
-	public void ApplyTestAttack() {
-		var action = new DamageAction(_state.Users.Find(u => u.Name != UDBase.Controllers.UserSystem.User.Name).Name, 1);
-		ApplyAction(action);
-	}
-
 	public void NextTurn() {
 		ApplyAction(new TurnAction());
 	}
@@ -147,6 +153,18 @@ public class GameController : IGame {
 		var actionName = action.GetType().FullName;
 		var json       = JsonUtils.Serialize(action);
 		_postClient.SendJsonPostRequest(CardUrl.Prepare(_postActionUrl, Sessions.CurrentSessionId, version, actionName), json);
+	}
+
+	public bool CanBought(CardState card) {
+		if ( card.Type == CardType.Hidden ) {
+			return false;
+		}
+		var userState = GetCurrentUserState();
+		return (_state.TurnOwner == userState.Name) && (card.Price <= userState.Power);
+	}
+
+	public UserState GetCurrentUserState() {
+		return _state.Users.Find(u => u.Name == User.Name);
 	}
 }
 
