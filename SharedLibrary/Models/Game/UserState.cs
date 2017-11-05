@@ -1,26 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using SharedLibrary.Common;
+using SharedLibrary.Utils;
+using System.Collections.Generic;
 
 namespace SharedLibrary.Models.Game {
 	public class UserState {
 		public string          Name      { get; private set; }
 		public int             Health    { get; set; }
 		public int             MaxHealth { get; private set; }
+		public int             Power     { get; set; }
+		public int             MaxPower  { get; set; }
 		public List<CardState> TableSet  { get; private set; }
 		public List<CardState> HandSet   { get; private set; }
 		public List<CardState> GlobalSet { get; private set; }
 
-		public UserState(string name, int health) : 
-			this(name, health, health, new List<CardState>(), new List<CardState>(), new List<CardState>()) {
+		public UserState(string name, int health, int power) :
+			this(
+				name,
+				health, health,
+				power, power,
+				table : new List<CardState>().Fill(null, GameRules.MaxTableSet), 
+				hand  : new List<CardState>(),
+				global: new List<CardState>())
+		{
 			// TODO: Use concrete set
-			for ( var i = 0; i < 10; i++ ) {
-				GlobalSet.Add(new CardState() { Type = CardType.Creature });
-			}
+			GlobalSet.Fill(() => new CardState(CardType.Creature).WithPrice(1).WithHealth(1).WithDamage(1), 10);
 		}
 
 		public UserState(
 			string          name,
 			int             health,
 			int             maxHealth,
+			int             power,
+			int             maxPower,
 			List<CardState> table,
 			List<CardState> hand,
 			List<CardState> global)
@@ -28,6 +39,8 @@ namespace SharedLibrary.Models.Game {
 			Name      = name;
 			Health    = health;
 			MaxHealth = maxHealth;
+			Power     = power;
+			MaxPower  = maxPower;
 			TableSet  = table;
 			HandSet   = hand;
 			GlobalSet = global;

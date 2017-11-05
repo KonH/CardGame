@@ -14,8 +14,8 @@ namespace SharedLibrary.Common {
 			return false;
 		}
 
-		public static ICollection<UserState> With(this ICollection<UserState> users, string name, int health) {
-			users.Add(new UserState(name, health));
+		public static ICollection<UserState> With(this ICollection<UserState> users, string name, int health, int power) {
+			users.Add(new UserState(name, health, power));
 			return users;
 		}
 	}

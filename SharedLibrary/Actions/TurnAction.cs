@@ -3,8 +3,9 @@ using SharedLibrary.Models;
 
 namespace SharedLibrary.Actions {
 	public class TurnAction : BaseGameAction, IExpandCardAction {
-		public string ExpandUser { get; private set; }
-		public bool ExpandHand   { get { return true; } }
+		public string ExpandUser  { get; private set; }
+		public bool   ExpandHand  { get { return true ; } }
+		public bool   ExpandTable { get { return false; } }
 
 		public TurnAction() {}
 
@@ -20,6 +21,7 @@ namespace SharedLibrary.Actions {
 					state.Turn++;
 				}
 				if ( state.Turn > 0 ) {
+					user.MaxPower++;
 					if ( user.HandSet.Count < GameRules.MaxHandSet ) {
 						var result = user.TryGetCard();
 						if ( result ) {
@@ -27,6 +29,7 @@ namespace SharedLibrary.Actions {
 						}
 					}
 				}
+				user.Power = user.MaxPower;
 			}
 		}
 	}

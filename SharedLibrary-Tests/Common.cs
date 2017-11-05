@@ -7,7 +7,7 @@ namespace SharedLibrary_Tests {
     static class Common {
 		public static ICollection<UserState> Users {
 			get {
-				return new List<UserState>().With("1", 1).With("2", 1);
+				return new List<UserState>().With("1", 1, 1).With("2", 1, 1);
 			}
 		}
 		public static GameState GameState {

@@ -35,7 +35,7 @@ namespace SharedLibrary.Models {
 
 		void PrepareStartSets() {
 			foreach ( var user in Users ) {
-				for ( var i = 0; i < GameRules.StartupHandSet; i++ ) {
+				for ( var i = 0; i < GameRules.StartHandSet; i++ ) {
 					user.TryGetCard();
 				}
 			}
@@ -44,7 +44,7 @@ namespace SharedLibrary.Models {
 		List<CardState> HideCards(List<CardState> cards) {
 			var newCards = new List<CardState>();
 			for ( var i = 0; i < cards.Count; i++ ) {
-				newCards.Add(new CardState() { Type = CardType.Hidden });
+				newCards.Add(new CardState(CardType.Hidden));
 			}
 			return newCards;
 		}
@@ -55,7 +55,15 @@ namespace SharedLibrary.Models {
 				var table   = user.TableSet;
 				var hand    = user.Name == userName ? user.HandSet : HideCards(user.HandSet);
 				var global  = HideCards(user.GlobalSet);
-				var newUser = new UserState(user.Name, user.Health, user.MaxHealth, table, hand, global);
+				var newUser = new UserState(
+					user.Name,
+					user.Health,
+					user.MaxHealth,
+					user.Power,
+					user.MaxPower,
+					table,
+					hand,
+					global);
 				state.Users.Add(newUser);
 			}
 			return state;

@@ -7,7 +7,7 @@ namespace SharedLibrary_Tests {
 		[Fact]
 		public void StartSetIsAdded() {
 			var state = Common.GameState;
-			Assert.True(state.Users.TrueForAll(u => u.HandSet.Count == GameRules.StartupHandSet));
+			Assert.True(state.Users.TrueForAll(u => u.HandSet.Count == GameRules.StartHandSet));
 		}
 
 		[Fact]
@@ -32,7 +32,7 @@ namespace SharedLibrary_Tests {
 		[Fact]
 		public void CardsNotOverspawned() {
 			var state = Common.GameState;
-			var turns = GameRules.MaxHandSet - GameRules.StartupHandSet + 1;
+			var turns = GameRules.MaxHandSet - GameRules.StartHandSet + 1;
 			while ( state.Turn < turns ) {
 				state.TryApply(new TurnAction(state.TurnOwner));
 				Assert.True(state.Users.TrueForAll(u => u.HandSet.Count <= GameRules.MaxHandSet));
