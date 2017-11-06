@@ -9,10 +9,12 @@ using Server.Models;
 namespace Server.Repositories {
 	public class GameRepository {
 		ILogger                                       _logger;
+		SessionRepository                             _sessions;
 		ConcurrentDictionary<string, ServerGameState> _games = new ConcurrentDictionary<string, ServerGameState>();
 
-		public GameRepository(ILogger<GameRepository> logger) {
-			_logger = logger;
+		public GameRepository(SessionRepository sessions, ILogger<GameRepository> logger) {
+			_sessions = sessions;
+			_logger   = logger;
 		}
 
 		public bool TryAdd(ServerGameState game) {
@@ -50,6 +52,7 @@ namespace Server.Repositories {
 				var gameState = state.SharedState;
 				if ( gameState.TryApply(action) ) {
 					AddAction(state, action);
+					TryEndGame(state);
 					return true;
 				}
 			}
@@ -89,6 +92,12 @@ namespace Server.Repositories {
 				if ( botAction != null ) {
 					TryApplyAction(state, botAction);
 				}
+			}
+		}
+
+		void TryEndGame(ServerGameState state) {
+			if ( state.SharedState.IsEnded ) {
+				_sessions.TryDelete(state.Session);
 			}
 		}
 
