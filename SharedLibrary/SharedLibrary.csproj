@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SharedLibrary</RootNamespace>
     <AssemblyName>SharedLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\Server\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,11 +44,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Actions\Base\BaseGameAction.cs" />
+    <Compile Include="Actions\EmptyAction.cs" />
+    <Compile Include="Actions\Base\ILimitedAction.cs" />
+    <Compile Include="Actions\ShowTableCardAction.cs" />
+    <Compile Include="Actions\ShowHandCardAction.cs" />
+    <Compile Include="Actions\Base\IExpandCardAction.cs" />
+    <Compile Include="Actions\BuyCreatureAction.cs" />
+    <Compile Include="Actions\AttackCreatureAction.cs" />
+    <Compile Include="Actions\AttackPlayerAction.cs" />
+    <Compile Include="Actions\TurnAction.cs" />
+    <Compile Include="Actions\Base\IGameAction.cs" />
+    <Compile Include="AI\GameAI.cs" />
+    <Compile Include="Common\Interaction.cs" />
+    <Compile Include="Common\GameRules.cs" />
+    <Compile Include="Common\SessionRules.cs" />
+    <Compile Include="Common\GameStateExtensions.cs" />
+    <Compile Include="Models\GameState.cs" />
+    <Compile Include="Models\Game\CardState.cs" />
+    <Compile Include="Models\Game\CardType.cs" />
+    <Compile Include="Models\Game\UserState.cs" />
+    <Compile Include="Models\Session.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CollectionUtils.cs" />
+    <Compile Include="Utils\ReflectionUtils.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)..\UnityClient\Assets\Libraries\$(TargetName).dll</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "$(SolutionDir)\UnityClient\Assets\Libraries\$(TargetName).dll</PostBuildEvent>
   </PropertyGroup>
 </Project>
