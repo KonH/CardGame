@@ -8,4 +8,5 @@ public class UserView : MonoBehaviour {
 	public CardSet Global;
 	public CardSet Hand;
 	public CardSet Table;
+	public CardSet User;
 }

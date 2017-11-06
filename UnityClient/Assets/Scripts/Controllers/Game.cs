@@ -9,6 +9,7 @@ using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
+using UDBase.Controllers.SceneSystem;
 
 public interface IGame : IController {
 	void Start();
@@ -16,7 +17,9 @@ public interface IGame : IController {
 	void ApplyAction<T>(T action) where T : IGameAction, new();
 	void NextTurn();
 	bool CanBought(CardState card);
-	UserState GetCurrentUserState();
+	UserState GetUserState();
+	UserState GetEnemyState();
+	void ApplyEnd();
 }
 
 public class Game : ControllerHelper<IGame> {
@@ -51,11 +54,24 @@ public class Game : ControllerHelper<IGame> {
 		return false;
 	}
 
-	public static UserState GetCurrentUserState() {
+	public static UserState GetUserState() {
 		if ( Instance != null ) {
-			return Instance.GetCurrentUserState();
+			return Instance.GetUserState();
 		}
 		return null;
+	}
+
+	public static UserState GetEnemyState() {
+		if ( Instance != null ) {
+			return Instance.GetEnemyState();
+		}
+		return null;
+	}
+
+	public static void ApplyEnd() {
+		if ( Instance != null ) {
+			Instance.ApplyEnd();
+		}
 	}
 }
 
@@ -125,6 +141,10 @@ public class GameController : IGame {
 		_lastUpdateTime = Time.realtimeSinceStartup;
 		if ( !resp.HasError ) {
 			ProcessNewAction(GetTypeHeader(resp), resp.Text);
+			if ( _state.IsEnded ) {
+				Events.Fire(new Game_End(_state.Winner));
+				_ready = false;
+			}
 		}
 	}
 
@@ -159,12 +179,29 @@ public class GameController : IGame {
 		if ( card.Type == CardType.Hidden ) {
 			return false;
 		}
-		var userState = GetCurrentUserState();
-		return (_state.TurnOwner == userState.Name) && (card.Price <= userState.Power);
+		var userState = GetUserState();
+		if ( (_state.TurnOwner == userState.Name) && (card.Price <= userState.Power) ) {
+			if ( card.Type == CardType.Creature ) {
+				foreach ( var tableCard in userState.TableSet ) {
+					if ( tableCard == null ) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
-	public UserState GetCurrentUserState() {
+	public UserState GetUserState() {
 		return _state.Users.Find(u => u.Name == User.Name);
+	}
+
+	public UserState GetEnemyState() {
+		return _state.Users.Find(u => u.Name != User.Name);
+	}
+
+	public void ApplyEnd() {
+		Scene.LoadSceneByName("Main");
 	}
 }
 

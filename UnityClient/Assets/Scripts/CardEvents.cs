@@ -40,3 +40,11 @@ public struct Game_Reload {
 		State = state;
 	}
 }
+
+public struct Game_End {
+	public string Winner { get; private set; }
+
+	public Game_End(string winner) {
+		Winner = winner;
+	}
+}
