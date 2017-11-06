@@ -9,6 +9,31 @@ namespace SharedLibrary.Models {
 		public int             Turn      { get; set; }
 		public List<UserState> Users     { get; private set; }
 
+		public bool IsEnded {
+			get {
+				var liveUsers = 0;
+				foreach ( var user in Users ) {
+					if ( user.Health > 0 ) {
+						liveUsers++;
+					}
+				}
+				return liveUsers <= 1;
+			}
+		}
+
+		public string Winner {
+			get {
+				if ( IsEnded ) {
+					foreach ( var user in Users ) {
+						if ( user.Health > 0 ) {
+							return user.Name;
+						}
+					}
+				}
+				return null;
+			}
+		}
+
 		public GameState() {}
 
 		public GameState(IEnumerable<UserState> users, string turnOwner): this(turnOwner, 0, 0) {

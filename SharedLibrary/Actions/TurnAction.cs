@@ -13,8 +13,8 @@ namespace SharedLibrary.Actions {
 			User = user;
 		}
 
-		public override void Apply(GameState state) {
-			var user = state.Users.Find(u => u.Name != state.TurnOwner);
+		protected override void ApplyInternal(GameState state) {
+			var user = FindAnotherPlayer(state);
 			if ( user != null ) {
 				state.TurnOwner = user.Name;
 				if ( state.Users.IndexOf(user) == 0 ) {
@@ -30,6 +30,11 @@ namespace SharedLibrary.Actions {
 					}
 				}
 				user.Power = user.MaxPower;
+				foreach ( var card in user.TableSet ) {
+					if ( card != null ) {
+						card.Actions = card.MaxActions;
+					}
+				}
 			}
 		}
 	}

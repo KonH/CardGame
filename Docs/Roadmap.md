@@ -14,7 +14,7 @@
 - [x] Global sets are invisible to any player
 - [x] Creature has damage and health
 - [x] User has health
-- [ ] Every turn creature can attack other player's creature or player (except first turn after summon)
-- [ ] If creature loses all its health, it is removed from table set
-- [ ] If player loses all his health, other player wins
+- [x] Every turn creature can attack other player's creature or player (except first turn after summon)
+- [x] If creature loses all its health, it is removed from table set
+- [x] If player loses all his health, other player wins
 - [x] Two players can play using server

@@ -13,8 +13,8 @@ namespace SharedLibrary.Actions {
 			Card        = card;
 		}
 
-		public override void Apply(GameState state) {
-			var user = state.Users.Find(u => u.Name == User);
+		protected override void ApplyInternal(GameState state) {
+			var user = FindCurrentPlayer(state);
 			if ( user != null ) {
 				var hiddenCard = user.HandSet.Find(c => c.Type == CardType.Hidden);
 				if ( hiddenCard != null ) {

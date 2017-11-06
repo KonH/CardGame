@@ -9,6 +9,6 @@ namespace SharedLibrary.Actions {
 			return true;
 		}
 
-		public override void Apply(GameState state) { }
+		protected override void ApplyInternal(GameState state) { }
 	}
 }

@@ -23,7 +23,13 @@ namespace SharedLibrary.Models.Game {
 				global: new List<CardState>())
 		{
 			// TODO: Use concrete set
-			GlobalSet.Fill(() => new CardState(CardType.Creature).WithPrice(1).WithHealth(1).WithDamage(1), 10);
+			GlobalSet.Fill(() => 
+				new CardState(CardType.Creature)
+				.WithPrice(1)
+				.WithHealth(1)
+				.WithDamage(1)
+				.WithActions(0, 1), 
+			10);
 		}
 
 		public UserState(

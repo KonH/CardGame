@@ -51,6 +51,8 @@
     <Compile Include="Actions\ShowHandCardAction.cs" />
     <Compile Include="Actions\Base\IExpandCardAction.cs" />
     <Compile Include="Actions\BuyCreatureAction.cs" />
+    <Compile Include="Actions\AttackCreatureAction.cs" />
+    <Compile Include="Actions\AttackPlayerAction.cs" />
     <Compile Include="Actions\TurnAction.cs" />
     <Compile Include="Actions\Base\IGameAction.cs" />
     <Compile Include="AI\GameAI.cs" />

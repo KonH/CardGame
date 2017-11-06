@@ -11,30 +11,21 @@ namespace SharedLibrary.Models.Game {
 			return value;
 		}
 
+		void SetStatValue(string name, int value) {
+			if ( Stats.ContainsKey(name) ) {
+				Stats[name] = value;
+			} else {
+				Stats.Add(name, value);
+			}
+		}
+
 		// TODO: Find way to disable serialization with ability to use in Unity client
-		public int Price {
-			get {
-				return GetStatValue("Price");
-			}
-		}
-
-		public int Health {
-			get {
-				return GetStatValue("Health");
-			}
-		}
-
-		public int MaxHealth {
-			get {
-				return GetStatValue("MaxHealth");
-			}
-		}
-
-		public int Damage {
-			get {
-				return GetStatValue("Damage");
-			}
-		}
+		public int Price      { get { return GetStatValue("Price");      } set { SetStatValue("Price",      value); } }
+		public int Health     { get { return GetStatValue("Health");     } set { SetStatValue("Health",     value); } }
+		public int MaxHealth  { get { return GetStatValue("MaxHealth");  } set { SetStatValue("MaxHealth",  value); } }
+		public int Damage     { get { return GetStatValue("Damage");     } set { SetStatValue("Damage",     value); } }
+		public int Actions    { get { return GetStatValue("Actions");    } set { SetStatValue("Actions",    value); } }
+		public int MaxActions { get { return GetStatValue("MaxActions"); } set { SetStatValue("MaxActions", value); } }
 
 		public CardState() {}
 
@@ -49,13 +40,19 @@ namespace SharedLibrary.Models.Game {
 		}
 
 		public CardState WithHealth(int value) {
-			Stats.Add("Health", value);
+			Stats.Add("Health",    value);
 			Stats.Add("MaxHealth", value);
 			return this;
 		}
 
 		public CardState WithDamage(int value) {
 			Stats.Add("Damage", value);
+			return this;
+		}
+
+		public CardState WithActions(int start, int max) {
+			Stats.Add("Actions",    start);
+			Stats.Add("MaxActions", max);
 			return this;
 		}
 	}

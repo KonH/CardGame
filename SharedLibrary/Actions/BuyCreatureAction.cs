@@ -19,7 +19,7 @@ namespace SharedLibrary.Actions {
 
 		public override bool CanApply(GameState state) {
 			if ( base.CanApply(state) ) {
-				var user = state.Users.Find(u => u.Name == User);
+				var user = FindCurrentPlayer(state);
 				if ( user != null ) {
 					if ( (HandIndex >= 0) && (HandIndex < user.HandSet.Count) ) {
 						var card = user.HandSet[HandIndex];
@@ -37,8 +37,8 @@ namespace SharedLibrary.Actions {
 			return false;
 		}
 
-		public override void Apply(GameState state) {
-			var user = state.Users.Find(u => u.Name == User);
+		protected override void ApplyInternal(GameState state) {
+			var user = FindCurrentPlayer(state);
 			var card = user.HandSet[HandIndex];
 			user.Power -= card.Price;
 			user.HandSet.Remove(card);
