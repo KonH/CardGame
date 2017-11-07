@@ -25,3 +25,7 @@
 - [ ] Dialogs (error, end, lost connection)
 - [ ] Mock art
 - [ ] Handle lost connection
+
+# Basic web admin app
+
+- [ ] Ability to manage users in separated web app
