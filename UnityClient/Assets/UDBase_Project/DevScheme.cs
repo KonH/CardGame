@@ -5,10 +5,9 @@ using UDBase.Controllers.UserSystem;
 using UDBase.Controllers.EventSystem;
 using UDBase.Controllers.SceneSystem;
 
-#if Scheme_DevScheme
-public class ProjectScheme : Scheme {
+public class DevScheme : Scheme {
 
-	public ProjectScheme() {
+	public DevScheme() {
 		var save = new InMemorySave();
 		save.AddNode<UserSaveNode>("user");
 		AddController<Save>(save);
@@ -20,7 +19,5 @@ public class ProjectScheme : Scheme {
 
 		AddController<Auth>    (new AuthController());
 		AddController<Sessions>(new SessionController());
-		AddController<Game>    (new GameController(1.0f));
 	}
 }
-#endif
