@@ -18,3 +18,10 @@
 - [x] If creature loses all its health, it is removed from table set
 - [x] If player loses all his health, other player wins
 - [x] Two players can play using server
+
+# Basic UX
+
+- [ ] Card animations (get, buy, attack, damage, destroy)
+- [ ] Dialogs (error, end, lost connection)
+- [ ] Mock art
+- [ ] Handle lost connection
