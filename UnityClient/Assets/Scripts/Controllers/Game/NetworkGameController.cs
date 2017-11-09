@@ -43,6 +43,7 @@ public class NetworkGameController : BaseGameController {
 	}
 
 	public override void Init() {
+		base.Init();
 		_updateClient.Init();
 		_postClient  .Init();
 	}

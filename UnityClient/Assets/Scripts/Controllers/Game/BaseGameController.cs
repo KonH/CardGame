@@ -1,16 +1,25 @@
-﻿using UDBase.Controllers.UserSystem;
+﻿using System.Collections.Generic;
+using UDBase.Controllers.LogSystem;
+using UDBase.Controllers.UserSystem;
 using UDBase.Controllers.EventSystem;
+using UDBase.Controllers.SceneSystem;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
-using UDBase.Controllers.SceneSystem;
 
 public abstract class BaseGameController : IGame {
 
+	public IGameAction CurrentAction { get; private set; }
+
 	protected abstract GameState State { get; }
 
-	public virtual void Init() {}
+	protected Queue<IGameAction> Actions { get; private set; }
+
+
+	public virtual void Init() {
+		Actions = new Queue<IGameAction>();
+	}
 
 	public virtual void PostInit() {}
 
@@ -25,11 +34,18 @@ public abstract class BaseGameController : IGame {
 	protected void ApplyIncomingAction(IGameAction action) {
 		if ( (action != null) && State.TryApply(action) ) {
 			// TODO: Implement concrete action handlers
-			OnNewActionApplyed();
+			OnNewActionApplied(action);
 		}
 	}
 
-	protected void OnNewActionApplyed() {
+	protected void OnNewActionApplied(IGameAction action) {
+		Log.MessageFormat("OnNewActionApplied: '{0}'", LogTags.Game, action);
+		Actions.Enqueue(action);
+	}
+
+	void FireNewAction(IGameAction action) {
+		Log.MessageFormat("FireNewAction: '{0}'", LogTags.Game, action);
+		CurrentAction = action;
 		Events.Fire(new Game_Reload(State));
 		if ( State.IsEnded ) {
 			Events.Fire(new Game_End(State.Winner));
@@ -37,9 +53,27 @@ public abstract class BaseGameController : IGame {
 		}
 	}
 
+	public void EndCurrentAction() {
+		Log.MessageFormat("EndCurrentAction: '{0}'", LogTags.Game, CurrentAction);
+		CurrentAction = null;
+		CheckForNewAction();
+	}
+
+	void CheckForNewAction() {
+		Log.Message("CheckForNewAction", LogTags.Game);
+		if ( Actions.Count > 0 ) {
+			var action = Actions.Dequeue();
+			FireNewAction(action);
+		}
+	}
+
 	protected virtual void OnGameEnd() {}
 
-	public virtual void Update() {}
+	public virtual void Update() {
+		if ( (CurrentAction == null) && (Actions.Count > 0) ) {
+			CheckForNewAction();
+		}
+	}
 
 	public void NextTurn() {
 		ApplyAction(new TurnAction());

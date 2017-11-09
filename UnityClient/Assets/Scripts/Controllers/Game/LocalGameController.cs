@@ -14,6 +14,10 @@ public class LocalGameController : BaseGameController {
 		}
 	}
 
+	public override void Init() {
+		base.Init();
+	} 
+
 	public override void Start() {
 		var users = new UserState[] {
 			new UserState(User.Name, 10, 1),
@@ -28,10 +32,10 @@ public class LocalGameController : BaseGameController {
 		if ( action != null ) {
 			action.User = User.Name;
 			if ( _fullState.TryApply(action) ) {
-				OnNewActionApplyed();
+				OnNewActionApplied(action);
 				var botAction =_bot.GetAction(_fullState.Filter("Enemy"));
 				if ( (botAction != null) && _fullState.TryApply(botAction) ) {
-					OnNewActionApplyed();
+					OnNewActionApplied(botAction);
 				}
 			}
 		}

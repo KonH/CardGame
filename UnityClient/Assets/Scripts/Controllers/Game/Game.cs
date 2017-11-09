@@ -3,6 +3,15 @@ using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
 
 public class Game : ControllerHelper<IGame> {
+	public static IGameAction CurrentAction {
+		get {
+			if ( Instance != null ) {
+				return Instance.CurrentAction;
+			}
+			return null;
+		}
+	}
+
 	public static void Start() {
 		if ( Instance != null ) {
 			Instance.Start();
@@ -51,6 +60,12 @@ public class Game : ControllerHelper<IGame> {
 	public static void ApplyEnd() {
 		if ( Instance != null ) {
 			Instance.ApplyEnd();
+		}
+	}
+
+	public static void EndCurrentAction() {
+		if ( Instance != null ) {
+			Instance.EndCurrentAction();
 		}
 	}
 }

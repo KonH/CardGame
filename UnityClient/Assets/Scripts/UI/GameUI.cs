@@ -44,6 +44,10 @@ public class GameUI : MonoBehaviour {
 	}
 
 	void Update() {
+		// Temp
+		if ( Game.CurrentAction != null ) {
+			Game.EndCurrentAction();
+		}
 		Game.Update();
 	}
 
