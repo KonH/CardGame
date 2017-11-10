@@ -1,8 +1,10 @@
 ﻿using UDBase.Controllers;
+using SharedLibrary.Models;
 using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
 
 public interface IGame : IController {
+	GameState State { get; }
 	IGameAction CurrentAction { get; }
 	void Start();
 	void Update();

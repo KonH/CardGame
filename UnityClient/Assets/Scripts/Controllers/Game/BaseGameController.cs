@@ -9,10 +9,9 @@ using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
 
 public abstract class BaseGameController : IGame {
+	public abstract GameState State { get; }
 
 	public IGameAction CurrentAction { get; private set; }
-
-	protected abstract GameState State { get; }
 
 	protected Queue<IGameAction> Actions { get; private set; }
 
@@ -33,7 +32,6 @@ public abstract class BaseGameController : IGame {
 
 	protected void ApplyIncomingAction(IGameAction action) {
 		if ( (action != null) && State.TryApply(action) ) {
-			// TODO: Implement concrete action handlers
 			OnNewActionApplied(action);
 		}
 	}
@@ -46,7 +44,7 @@ public abstract class BaseGameController : IGame {
 	void FireNewAction(IGameAction action) {
 		Log.MessageFormat("FireNewAction: '{0}'", LogTags.Game, action);
 		CurrentAction = action;
-		Events.Fire(new Game_Reload(State));
+		Events.Fire(new Game_NewAction(action));
 		if ( State.IsEnded ) {
 			Events.Fire(new Game_End(State.Winner));
 			OnGameEnd();

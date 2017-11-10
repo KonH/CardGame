@@ -12,7 +12,7 @@ public class NetworkGameController : BaseGameController {
 	const string _postActionUrl = "{0}/api/game/action?session={1}&version={2}&type={3}";
 
 	GameState _state;
-	protected override GameState State {
+	public override GameState State {
 		get {
 			return _state;
 		}

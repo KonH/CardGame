@@ -8,7 +8,7 @@ public class LocalGameController : BaseGameController {
 	GameState _fullState;
 	GameAI    _bot;
 
-	protected override GameState State {
+	public override GameState State {
 		get {
 			return _fullState.Filter(User.Name);
 		}

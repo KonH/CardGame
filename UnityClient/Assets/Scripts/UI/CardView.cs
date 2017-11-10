@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UDBase.Utils;
+using DG.Tweening;
 
 public class CardView : MonoBehaviour {
 	public Button     Button;
@@ -10,7 +12,8 @@ public class CardView : MonoBehaviour {
 	public Text       Attack;
 	public Text       Hp;
 
-	Action _callback;
+	Sequence _seq;
+	Action   _callback;
 
 	public bool Interactable {
 		get {
@@ -35,6 +38,7 @@ public class CardView : MonoBehaviour {
 	}
 
 	public void Init(bool withContent, bool interactable, string name, int price, int attack, int hp, int maxHp) {
+		_seq = TweenHelper.Reset(_seq);
 		Button.gameObject.SetActive(interactable);
 		Content.SetActive(withContent);
 		SetText(Name,   name);
@@ -53,6 +57,14 @@ public class CardView : MonoBehaviour {
 
 	public void AddCallback(Action callback) {
 		_callback = callback;
+	}
+
+	public void SetEffect(Tween t, Action callback = null) {
+		_seq = TweenHelper.Replace(_seq);
+		_seq.Append(t);
+		if ( callback != null ) {
+			_seq.AppendCallback(() => callback());
+		}
 	}
 
 	void OnClick() {

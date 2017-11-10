@@ -1,8 +1,18 @@
 ﻿using UDBase.Controllers;
+using SharedLibrary.Models;
 using SharedLibrary.Actions;
 using SharedLibrary.Models.Game;
 
 public class Game : ControllerHelper<IGame> {
+	public static GameState State {
+		get {
+			if ( Instance != null ) {
+				return Instance.State;
+			}
+			return null;
+		}
+	}
+
 	public static IGameAction CurrentAction {
 		get {
 			if ( Instance != null ) {
