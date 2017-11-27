@@ -28,4 +28,4 @@
 
 # Basic web admin app
 
-- [ ] Ability to manage users in separated web app
+- [x] Ability to manage users in separated web app

@@ -1,0 +1,43 @@
+﻿@page
+@model EditUser
+@{
+    var user = Model.UserToEdit;
+    var isEditable = !string.IsNullOrEmpty(user.Login);
+}
+<h2>User:
+    @if ( isEditable ) {
+        @Model.UserToEdit.Login
+    } else {
+        @:New
+    }
+</h2>
+<form method="post">
+    @if ( isEditable ) {
+        <input type="hidden" name="oldLogin" value="@user.Login"/>
+    } else {
+        <b>Login:</b><br /><input name="newLogin" /><br />
+    }
+    <b>Name:</b><br />
+    <input name="name" value="@user.Name"/><br />
+    <b>Password:</b><br />
+    <input name="password" value="@user.Password"/><br />
+    <b>Role:</b><br />
+    <input name="role" type="radio" value="user" 
+           @if(user.Role == "user") { 
+              @:checked="checked" 
+           }
+    /><span>User</span><br />
+    <input name="role" type="radio" value="admin"
+           @if(user.Role == "admin") { 
+              @:checked="checked" 
+           }
+    /><span>Admin</span><br />
+    <input type="submit" value="Confirm"/>
+</form>
+@if ( isEditable ) {
+    <form method="post">
+        <input type="hidden" name="delete" value="true" />
+        <input type="hidden" name="oldLogin" value="@user.Login" />
+        <input type="submit" value="Delete"/>
+    </form>
+}
