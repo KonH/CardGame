@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Server.Models;
+using ServerSharedLibrary.Models;
 
 namespace Server.Repositories {
 	public interface IUserRepository {

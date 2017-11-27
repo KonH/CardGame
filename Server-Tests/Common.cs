@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Server.Models;
 using Server.Repositories;
 using ServerSharedLibrary;
+using ServerSharedLibrary.Models;
 
 namespace Server.Tests {
 	public static class Common {
