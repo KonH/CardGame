@@ -29,3 +29,10 @@
 # Basic web admin app
 
 - [x] Ability to manage users in separated web app
+
+# Web admin improvements
+
+- [ ] Connection config and trusted hosts list
+- [ ] Bootstrap design
+- [ ] Login validation
+- [ ] Error handling
