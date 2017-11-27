@@ -1,0 +1,7 @@
+﻿
+@model IEnumerable<User>
+<ul>
+@foreach (var user in Model) {
+    <li><b>@user.Name</b> (@user.Login:@user.Password), @user.Role</li>
+}
+</ul>
