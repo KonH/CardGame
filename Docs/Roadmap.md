@@ -38,5 +38,6 @@
 
 # Security
 
-- [ ] Client/server: Password => hash(pass+salt(login))
+- [x] Client/server: Password => hash(pass+salt(login))
+- [ ] Admin: Setup password input
 - [ ] Admin: Connection config and trusted hosts list
