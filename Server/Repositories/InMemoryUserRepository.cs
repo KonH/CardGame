@@ -5,10 +5,10 @@ using ServerSharedLibrary.Models;
 namespace Server.Repositories {
 	public class InMemoryUserRepository : IUserRepository {
 		ConcurrentDictionary<string, User> _users = new ConcurrentDictionary<string, User> {
-			["1"] = new User("1", "1", "user1", "admin"),
-			["2"] = new User("2", "2", "user2", "user"),
-			["3"] = new User("3", "3", "user3", "user"),
-			["4"] = new User("4", "4", "user4", "user")
+			["1"] = User.WithPassword("1", "1", "user1", "admin"),
+			["2"] = User.WithPassword("2", "2", "user2", "user"),
+			["3"] = User.WithPassword("3", "3", "user3", "user"),
+			["4"] = User.WithPassword("4", "4", "user4", "user")
 		};
 
 		public IEnumerable<User> All {
@@ -17,9 +17,9 @@ namespace Server.Repositories {
 			}
 		}
 
-		public User Find(string login, string password) {
+		public User Find(string login, string passwordHash) {
 			if ( _users.TryGetValue(login, out User user) ) {
-				if ( user.Password == password ) {
+				if ( user.PasswordHash == passwordHash ) {
 					return user;
 				}
 			}
@@ -48,6 +48,8 @@ namespace Server.Repositories {
 				return false;
 			}
 			if ( _users.TryGetValue(user.Login, out User oldUser) ) {
+				// Temp: password update is not yet supported via admin tool
+				user.PasswordHash = oldUser.PasswordHash;
 				return _users.TryUpdate(user.Login, user, oldUser);
 			}
 			return false;
