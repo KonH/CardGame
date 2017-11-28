@@ -32,7 +32,11 @@
 
 # Web admin improvements
 
-- [ ] Connection config and trusted hosts list
 - [ ] Bootstrap design
 - [ ] Login validation
 - [ ] Error handling
+
+# Security
+
+- [ ] Client/server: Password => hash(pass+salt(login))
+- [ ] Admin: Connection config and trusted hosts list
