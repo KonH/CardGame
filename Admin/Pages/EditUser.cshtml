@@ -19,8 +19,10 @@
     }
     <b>Name:</b><br />
     <input name="name" value="@user.Name"/><br />
-    <b>Password:</b><br />
-    <input name="password" value="@user.Password"/><br />
+    @if ( !isEditable ) {
+        <b>Password:</b><br />
+        <input name="password"/><br />
+    }
     <b>Role:</b><br />
     <input name="role" type="radio" value="user" 
            @if(user.Role == "user") { 

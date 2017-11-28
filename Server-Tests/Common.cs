@@ -14,9 +14,9 @@ namespace Server.Tests {
 		public static string AuthTokenPathWithArgs => Routing.AuthTokenPathWithArgs;
 
 		public static async Task<string> GetAuthToken(HttpClient client, User user) {
-			var login    = user.Login;
-			var password = user.Password;
-			return await Auth.GetAuthToken(client, login, password);
+			var login        = user.Login;
+			var passwordHash = user.PasswordHash;
+			return await Auth.GetAuthToken(client, login, passwordHash);
 		}
 
 		public static void AddToken(HttpClient client, string token) {
@@ -34,7 +34,7 @@ namespace Server.Tests {
 
 		public static async Task AuthorizeClient(TestServer server, HttpClient client, string userName) {
 			var user  = FindUsers(server).First(u => u.Name == userName);
-			await Auth.AuthorizeClient(client, user.Login, user.Password);
+			await Auth.AuthorizeClient(client, user.Login, user.PasswordHash);
 		} 
 	}
 }

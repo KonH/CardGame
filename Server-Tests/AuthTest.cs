@@ -32,10 +32,10 @@ namespace Server.Tests {
 
 		[Fact]
 		public async Task CanGetTokenForFoundUser() {
-			var user     = Common.FindUsers(_server).First();
-			var login    = user.Login;
-			var password = user.Password;
-			var response = await _client.GetAsync(string.Format(Common.AuthTokenPathWithArgs, login, password));
+			var user         = Common.FindUsers(_server).First();
+			var login        = user.Login;
+			var passwordHash = user.PasswordHash;
+			var response = await _client.GetAsync(string.Format(Common.AuthTokenPathWithArgs, login, passwordHash));
 			Assert.True(response.IsSuccessStatusCode);
 		}
 

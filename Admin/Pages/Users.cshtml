@@ -7,7 +7,7 @@
 <ul>
     @foreach ( var user in Model.Users ) {
         <li>
-            <b>@user.Name</b> (@user.Login:@user.Password), @user.Role
+            <b>@user.Name</b> (@user.Login:@user.PasswordHash), @user.Role
             <form method="get" action="EditUser">
                 <input type="hidden" name="login" value="@user.Login" />
                 <input type="submit" value="Edit" />

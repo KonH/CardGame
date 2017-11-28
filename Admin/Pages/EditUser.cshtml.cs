@@ -23,7 +23,7 @@ namespace Admin.Pages {
 				}
 			}
 			if ( UserToEdit == null ) {
-				UserToEdit = new User("", "", "", "");
+				UserToEdit = ServerSharedLibrary.Models.User.WithPassword("", "", "", "");
 			}
 			return Page();
 		}
@@ -38,7 +38,7 @@ namespace Admin.Pages {
 				return RedirectToPage("Users");
 			}
 			var login = !string.IsNullOrEmpty(newLogin) ? newLogin : oldLogin;
-			var user = new User(login, password, name, role);
+			var user = ServerSharedLibrary.Models.User.WithPassword(login, password, name, role);
 			var jsonContent = JsonConvert.SerializeObject(user);
 			var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 			var url = "api/user";

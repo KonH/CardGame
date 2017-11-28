@@ -20,11 +20,11 @@ namespace Server.Controllers {
 		}
 
 		[HttpGet("token")]
-		public IActionResult GetToken(string login, string password) {
-			if ( string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password) ) {
+		public IActionResult GetToken(string login, string passwordHash) {
+			if ( string.IsNullOrEmpty(login) || string.IsNullOrEmpty(passwordHash) ) {
 				return BadRequest("Invalid login or password");
 			}
-			var identity = GetIdentity(login, password);
+			var identity = GetIdentity(login, passwordHash);
 			if ( identity == null ) {
 				return BadRequest("Invalid login or password");
 			}
@@ -47,8 +47,8 @@ namespace Server.Controllers {
 			return Json(response);
 		}
 
-		private ClaimsIdentity GetIdentity(string login, string password) {
-			var user = _users.Find(login, password);
+		private ClaimsIdentity GetIdentity(string login, string passwordHash) {
+			var user = _users.Find(login, passwordHash);
 			if ( user != null ) {
 				var claims = new List<Claim>
 				{

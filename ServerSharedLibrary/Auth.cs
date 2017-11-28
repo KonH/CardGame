@@ -4,8 +4,8 @@ using Newtonsoft.Json.Linq;
 
 namespace ServerSharedLibrary {
 	public class Auth {
-		public static async Task<string> GetAuthToken(HttpClient client, string login, string password) {
-			var loginResponse = await client.GetAsync(string.Format(Routing.AuthTokenPathWithArgs, login, password));
+		public static async Task<string> GetAuthToken(HttpClient client, string login, string passwordHash) {
+			var loginResponse = await client.GetAsync(string.Format(Routing.AuthTokenPathWithArgs, login, passwordHash));
 			loginResponse.EnsureSuccessStatusCode();
 			var responseText = await loginResponse.Content.ReadAsStringAsync();
 			var tokenObj = JObject.Parse(responseText);
@@ -17,8 +17,8 @@ namespace ServerSharedLibrary {
 			client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 		}
 
-		public static async Task AuthorizeClient(HttpClient client, string login, string password) {
-			var token = await GetAuthToken(client, login, password);
+		public static async Task AuthorizeClient(HttpClient client, string login, string passwordHash) {
+			var token = await GetAuthToken(client, login, passwordHash);
 			AddToken(client, token);
 		}
 	}
