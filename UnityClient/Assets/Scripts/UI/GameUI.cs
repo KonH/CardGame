@@ -43,6 +43,7 @@ public class GameUI : MonoBehaviour {
 		Events.Subscribe<Game_Init>(this, OnGameInit);
 		Events.Subscribe<Game_Reload>(this, OnGameReload);
 		Events.Subscribe<Game_End>(this, OnGameEnd);
+		Events.Subscribe<Common_Error>(this, OnGameError);
 		Events.Subscribe<Game_NewAction>(this, OnGameNewAction);
 
 		Game.Start();
@@ -52,6 +53,7 @@ public class GameUI : MonoBehaviour {
 		Events.Unsubscribe<Game_Init>(OnGameInit);
 		Events.Unsubscribe<Game_Reload>(OnGameReload);
 		Events.Unsubscribe<Game_End>(OnGameEnd);
+		Events.Unsubscribe<Common_Error>(OnGameError);
 		Events.Unsubscribe<Game_NewAction>(OnGameNewAction);
 	}
 
@@ -63,9 +65,12 @@ public class GameUI : MonoBehaviour {
 		FullStateUpdate(e.State);
 	}
 
+	void OnGameError(Common_Error e) {
+		NoticeWindow.ShowWithOkButton("Server Error", e.Text, Game.ApplyEnd);
+	}
+
 	void OnGameEnd(Game_End e) {
-		Log.MessageFormat("GameEnded: Winner: '{0}'", LogTags.UI, e.Winner);
-		Game.ApplyEnd();
+		NoticeWindow.ShowWithOkButton("Game Ended", string.Format("Winner is '{0}'", e.Winner), Game.ApplyEnd);
 	}
 
 	void OnGameReload(Game_Reload e) {
