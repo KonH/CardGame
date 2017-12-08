@@ -2,6 +2,14 @@
 using SharedLibrary.Models;
 using SharedLibrary.Actions;
 
+public struct Common_Error {
+	public string Text { get; private set; }
+
+	public Common_Error(string text) {
+		Text = text;
+	}
+}
+
 public struct Auth_UpdateHeader {
 	public string AuthHeader { get; private set; }
 

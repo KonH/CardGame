@@ -46,8 +46,7 @@ public abstract class BaseGameController : IGame {
 		CurrentAction = action;
 		Events.Fire(new Game_NewAction(action));
 		if ( State.IsEnded ) {
-			Events.Fire(new Game_End(State.Winner));
-			OnGameEnd();
+			FireGameEnded();
 		}
 	}
 
@@ -63,6 +62,11 @@ public abstract class BaseGameController : IGame {
 			var action = Actions.Dequeue();
 			FireNewAction(action);
 		}
+	}
+
+	void FireGameEnded() {
+		Events.Fire(new Game_End(State.Winner));
+		OnGameEnd();
 	}
 
 	protected virtual void OnGameEnd() {}

@@ -134,9 +134,9 @@ class AuthController : IAuthController {
 		}
 		var errorText = "";
 		if ( !success ) {
-			errorText = !string.IsNullOrEmpty(resp.Text) ? resp.Text : resp.Code.ToString();
+			errorText = resp.GetNonEmptyText();
 		}
-		callback?.Invoke(success, errorText);
+		callback?.Invoke(success, TextUtils.TrimQuotes(errorText));
 	}
 
 	Jwtoken ExtractToken(string json) {

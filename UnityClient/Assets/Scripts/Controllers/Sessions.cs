@@ -58,8 +58,16 @@ public class SessionController : ISessionController {
 
 	public string CurrentSessionId { get; private set; }
 
-	BearerWebClient _client = new BearerWebClient();
-	List<Session> _sessions = new List<Session>();
+	int _retryCount = 0;
+
+	BearerWebClient _client        = new BearerWebClient();
+	List<Session>   _sessions      = new List<Session>();
+	int             _curRetryCount = 0;
+	bool            _ready         = true;
+
+	public SessionController(int retryCount) {
+		_retryCount = retryCount;
+	}
 
 	public void Init() {
 		_client.Init();
@@ -72,7 +80,7 @@ public class SessionController : ISessionController {
 	}
 
 	public void TryConnect(string sessionId) {
-		if ( !_client.InProgress ) {
+		if ( _ready && !_client.InProgress ) {
 			_client.SendPostRequest(CardUrl.Prepare(_connectUrl, sessionId), "", onComplete: (resp) => OnConnectComplete(sessionId, resp));
 		}
 	}
@@ -82,11 +90,13 @@ public class SessionController : ISessionController {
 		if ( !resp.HasError ) {
 			CurrentSessionId = id;
 			Events.Fire(new Session_ConnectComplete(id));
+		} else {
+			Events.Fire(new Common_Error(resp.GetNonEmptyText()));
 		}
 	}
 
 	public void TryRefresh() {
-		if ( !_client.InProgress ) {
+		if ( _ready && !_client.InProgress ) {
 			Log.Message("TryRefresh.", LogTags.Session);
 			_client.SendGetRequest(CardUrl.Prepare(_refreshUrl), onComplete: OnRefreshSessionsComplete);
 		}
@@ -96,6 +106,13 @@ public class SessionController : ISessionController {
 		if ( !resp.HasError ) {
 			SetupSessions(resp.Text);
 			UpdateUserSession(_sessions);
+			_curRetryCount = 0;
+		} else {
+			_curRetryCount++;
+			if ( _curRetryCount >= _retryCount ) {
+				_ready = false;
+				Events.Fire(new Common_Error(resp.GetNonEmptyText()));
+			}
 		}
 		Events.Fire(new Session_Update(_sessions));
 	}
@@ -118,14 +135,14 @@ public class SessionController : ISessionController {
 	}
 
 	public void TryCreate() {
-		if ( !_client.InProgress ) {
+		if ( _ready && !_client.InProgress ) {
 			Log.Message("TryCreate.", LogTags.Session);
 			_client.SendPostRequest(CardUrl.Prepare(_createUrl), "");
 		}
 	}
 
 	public void TryClose() {
-		if ( !_client.InProgress && !string.IsNullOrEmpty(CurrentSessionId) ) {
+		if ( _ready && !_client.InProgress && !string.IsNullOrEmpty(CurrentSessionId) ) {
 			Log.Message("TryClose", LogTags.Session);
 			_client.SendDeleteRequest(CardUrl.Prepare(_closeUrl, CurrentSessionId));
 		}

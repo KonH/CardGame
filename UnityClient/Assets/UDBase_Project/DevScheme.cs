@@ -18,6 +18,6 @@ public class DevScheme : Scheme {
 		AddController<Scene> (new DirectSceneLoader());
 
 		AddController<Auth>    (new AuthController());
-		AddController<Sessions>(new SessionController());
+		AddController<Sessions>(new SessionController(5));
 	}
 }

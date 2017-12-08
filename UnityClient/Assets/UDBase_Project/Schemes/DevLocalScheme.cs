@@ -1,7 +1,4 @@
 #if Scheme_DevLocalScheme
-using UnityEngine;
-using System.Collections;
-using UDBase.Common;
 
 public class ProjectScheme : DevScheme {
 

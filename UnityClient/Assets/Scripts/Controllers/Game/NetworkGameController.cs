@@ -5,6 +5,7 @@ using SharedLibrary.Utils;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Actions;
+using UDBase.Controllers.EventSystem;
 
 public class NetworkGameController : BaseGameController {
 	const string _getStateUrl   = "{0}/api/game/state?session={1}";
@@ -33,12 +34,13 @@ public class NetworkGameController : BaseGameController {
 	BearerWebClient _updateClient   = new BearerWebClient();
 	BearerWebClient _postClient     = new BearerWebClient();
 	float           _updateInterval = 0.0f;
+	int             _retryCount     = 0;
 
 	bool  _ready;
 	float _lastUpdateTime;
+	int   _curRetryCount;
 
-
-	public NetworkGameController(float updateInterval) {
+	public NetworkGameController(float updateInterval, int retryCount) {
 		_updateInterval = updateInterval;
 	}
 
@@ -80,6 +82,13 @@ public class NetworkGameController : BaseGameController {
 		_lastUpdateTime = Time.realtimeSinceStartup;
 		if ( !resp.HasError ) {
 			ParseNewAction(GetTypeHeader(resp), resp.Text);
+			_curRetryCount = 0;
+		} else {
+			_curRetryCount++;
+			if(_curRetryCount >= _retryCount ) {
+				Events.Fire(new Common_Error(resp.GetNonEmptyText()));
+				OnGameEnd();
+			}
 		}
 	}
 
