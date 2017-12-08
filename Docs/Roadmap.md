@@ -22,9 +22,9 @@
 # Basic UX
 
 - [ ] Card animations (get, buy, attack, damage, destroy)
-- [ ] Dialogs (error, end, lost connection)
+- [x] Dialogs (error, end, lost connection)
 - [ ] Mock art
-- [ ] Handle lost connection
+- [x] Handle lost connection
 
 # Basic web admin app
 
