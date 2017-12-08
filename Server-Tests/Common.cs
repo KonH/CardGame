@@ -5,26 +5,22 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.TestHost;
 using Server.Models;
 using Server.Repositories;
-using Newtonsoft.Json.Linq;
+using ServerSharedLibrary;
+using ServerSharedLibrary.Models;
 
 namespace Server.Tests {
 	public static class Common {
-		public const string AuthTokenPath         = "api/auth/token";
-		public const string AuthTokenPathWithArgs = "api/auth/token?login={0}&password={1}";
+		public static string AuthTokenPath         => Routing.AuthTokenPath;
+		public static string AuthTokenPathWithArgs => Routing.AuthTokenPathWithArgs;
 
 		public static async Task<string> GetAuthToken(HttpClient client, User user) {
-			var login         = user.Login;
-			var password      = user.Password;
-			var loginResponse = await client.GetAsync(string.Format(AuthTokenPathWithArgs, login, password));
-			loginResponse.EnsureSuccessStatusCode();
-			var responseText = await loginResponse.Content.ReadAsStringAsync();
-			var tokenObj = JObject.Parse(responseText);
-			var token = tokenObj.GetValue("token").ToString();
-			return token;
+			var login        = user.Login;
+			var passwordHash = user.PasswordHash;
+			return await Auth.GetAuthToken(client, login, passwordHash);
 		}
 
 		public static void AddToken(HttpClient client, string token) {
-			client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+			Auth.AddToken(client, token);
 		}
 
 		public static T GetService<T>(TestServer server) where T:class {
@@ -38,8 +34,7 @@ namespace Server.Tests {
 
 		public static async Task AuthorizeClient(TestServer server, HttpClient client, string userName) {
 			var user  = FindUsers(server).First(u => u.Name == userName);
-			var token = await GetAuthToken(client, user);
-			AddToken(client, token);
+			await Auth.AuthorizeClient(client, user.Login, user.PasswordHash);
 		} 
 	}
 }

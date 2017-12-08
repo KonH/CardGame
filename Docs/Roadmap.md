@@ -25,3 +25,19 @@
 - [ ] Dialogs (error, end, lost connection)
 - [ ] Mock art
 - [ ] Handle lost connection
+
+# Basic web admin app
+
+- [x] Ability to manage users in separated web app
+
+# Web admin improvements
+
+- [ ] Bootstrap design
+- [ ] Login validation
+- [ ] Error handling
+
+# Security
+
+- [x] Client/server: Password => hash(pass+salt(login))
+- [ ] Admin: Setup password input
+- [ ] Admin: Connection config and trusted hosts list
