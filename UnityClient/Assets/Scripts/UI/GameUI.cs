@@ -28,6 +28,7 @@ public class GameUI : MonoBehaviour {
 		TurnButton.onClick.AddListener(OnTurnClick);
 
 		AddHandler<TurnAction>(OnTurnAction);
+		AddHandler<BuyCreatureAction>(OnBuyCreatureAction);
 	}
 
 	void AddHandler<T>(Action<T> handler) where T : class, IGameAction {
@@ -83,7 +84,7 @@ public class GameUI : MonoBehaviour {
 		var users = state.Users;
 		foreach ( var user in users ) {
 			var active = user.Name == state.TurnOwner;
-			DrawUserState(user, active);
+			DrawUserState(user, active, true);
 			if ( user.Name == User.Name ) {
 				UpdateControlState(active);
 			}
@@ -105,7 +106,7 @@ public class GameUI : MonoBehaviour {
 		return activeUser && Game.CanBought(card);
 	}
 
-	void DrawUserState(UserState userState, bool activeUser) {
+	void DrawUserState(UserState userState, bool activeUser, bool full) {
 		var view = SelectView(userState);
 		var nameText = userState.Name;
 		if ( activeUser ) {
@@ -115,6 +116,9 @@ public class GameUI : MonoBehaviour {
 		view.HPText.text = string.Format("HP: {0}/{1}", userState.Health, userState.MaxHealth);
 		view.PowerText.text = string.Format("PW: {0}/{1}", userState.Power, userState.MaxPower);
 
+		if ( !full ) {
+			return;
+		}
 		UpdateUserHolder(false, view.User);
 		UpdateGlobalCount(userState.GlobalSet.Count, view.Global);
 		UpdateCards(userState.HandSet, view.Hand, (card) => GetHandCardInteractable(activeUser, card));
@@ -243,6 +247,7 @@ public class GameUI : MonoBehaviour {
 				return;
 			}
 		}
+		Log.WarningFormat("No handler for action: '{0}'", LogTags.Game, e.Action.GetType());
 		OnCommonAction();
 	}
 
@@ -251,16 +256,63 @@ public class GameUI : MonoBehaviour {
 		Game.EndCurrentAction();
 	}
 
+	void PerformCommonCallback() {
+		Game.EndCurrentAction();
+		var isUserTurn = User.Name == Game.State.TurnOwner;
+		DrawUserState(Game.GetUserState(), isUserTurn, false);
+		DrawUserState(Game.GetEnemyState(), false, false);
+	}
+
 	void OnTurnAction(TurnAction action) {
-		Action callback = () => Game.EndCurrentAction();
-		if 
-		( action.User != User.Name ?
-			CheckNewCards(Game.GetUserState(), Player.Hand, callback) :
-			CheckNewCards(Game.GetEnemyState(), Enemy.Hand, callback)
-		) {
+		Action callback = PerformCommonCallback;
+		var state = GetUserState(action);
+		var view = GetUserView(action);
+		if ( CheckNewCards(state, view.Hand, callback) ) {
 			return;
 		}
 		callback();
+	}
+
+	UserView GetUserView(BaseGameAction action) {
+		return GetUserView(action.User);
+	}
+
+	UserView GetUserView(string userName) {
+		if ( userName == User.Name ) {
+			return Player;
+		}
+		return Enemy;
+	}
+
+	UserState GetUserState(BaseGameAction action) {
+		return GetUserState(action.User);
+	}
+
+	UserState GetUserState(string userName) {
+		if ( userName == User.Name ) {
+			return Game.GetUserState();
+		}
+		return Game.GetEnemyState();
+	}
+
+	void OnBuyCreatureAction(BuyCreatureAction action) {
+		Action callback = PerformCommonCallback;
+		var userView = GetUserView(action);
+		var hand = userView.Hand;
+		var table = userView.Table;
+		var cardToSpawn = hand.Cards[action.HandIndex];
+		var oldPos = cardToSpawn.Root.position;
+		cardToSpawn.Root.SetParent(GameObject.FindObjectOfType<Canvas>().transform, true);
+		hand.Remove(cardToSpawn, false);
+		var cardToReplace = table.Cards[action.TableIndex];
+		var newPos = cardToReplace.Root.transform.position;
+		table.Remove(cardToReplace, true);
+		table.Insert(cardToSpawn, action.TableIndex);
+		var seq = DOTween.Sequence();
+		seq.AppendInterval(0.01f);
+		seq.AppendCallback(() => cardToSpawn.Root.SetParent(cardToSpawn.transform, true));
+		seq.Append(cardToSpawn.Root.DOLocalMove(Vector3.zero, 0.33f, true));
+		cardToSpawn.SetEffect(seq, callback);
 	}
 
 	bool CheckNewCards(UserState userState, CardSet handSet, Action callback) {

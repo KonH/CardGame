@@ -5,6 +5,7 @@ using UDBase.Utils;
 using DG.Tweening;
 
 public class CardView : MonoBehaviour {
+	public Transform  Root;
 	public Button     Button;
 	public GameObject Content;
 	public Text       Name;
@@ -62,6 +63,14 @@ public class CardView : MonoBehaviour {
 	public void SetEffect(Tween t, Action callback = null) {
 		_seq = TweenHelper.Replace(_seq);
 		_seq.Append(t);
+		if ( callback != null ) {
+			_seq.AppendCallback(() => callback());
+		}
+	}
+
+	public void SetEffect(Sequence seq, Action callback = null) {
+		TweenHelper.Reset(_seq);
+		_seq = seq;
 		if ( callback != null ) {
 			_seq.AppendCallback(() => callback());
 		}
