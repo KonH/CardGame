@@ -14,5 +14,6 @@ public enum LogTags {
 	Audio = 13,
 	Sound = 14,
 	Auth = 100,
-	Session = 101
+	Session = 101,
+	Game = 102
 }

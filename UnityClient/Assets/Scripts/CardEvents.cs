@@ -1,5 +1,14 @@
 ﻿using System.Collections.Generic;
 using SharedLibrary.Models;
+using SharedLibrary.Actions;
+
+public struct Common_Error {
+	public string Text { get; private set; }
+
+	public Common_Error(string text) {
+		Text = text;
+	}
+}
 
 public struct Auth_UpdateHeader {
 	public string AuthHeader { get; private set; }
@@ -46,5 +55,13 @@ public struct Game_End {
 
 	public Game_End(string winner) {
 		Winner = winner;
+	}
+}
+
+public struct Game_NewAction {
+	public IGameAction Action { get; private set; }
+
+	public Game_NewAction(IGameAction action) {
+		Action = action;
 	}
 }

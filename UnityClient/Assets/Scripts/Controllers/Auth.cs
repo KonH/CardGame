@@ -6,6 +6,7 @@ using UDBase.Controllers.LogSystem;
 using UDBase.Controllers.UserSystem;
 using UDBase.Controllers.EventSystem;
 using FullSerializer;
+using SharedLibrary.Utils;
 
 public interface IAuthController : IController {
 	string Login      { get; }
@@ -86,7 +87,7 @@ class AuthController : IAuthController {
 		}
 	}
 
-	const string _authUrl = "{0}/api/auth/token?login={1}&password={2}";
+	const string _authUrl = "{0}/api/auth/token?login={1}&passwordHash={2}";
 
 	WebClient _client = new WebClient();
 
@@ -113,7 +114,8 @@ class AuthController : IAuthController {
 		Password = password;
 		Log.MessageFormat("TryLogin: login: '{0}', password: '{1}'", LogTags.Auth, login, password);
 		if ( !_client.InProgress ) {
-			var request = CardUrl.Prepare(_authUrl, login, password);
+			var passwordHash = LoginUtils.MakePasswordHash(login, password);
+			var request = CardUrl.Prepare(_authUrl, login, passwordHash);
 			_client.SendGetRequest(request, onComplete: resp => OnLoginComplete(resp, onComplete));
 		}
 	}
@@ -132,9 +134,9 @@ class AuthController : IAuthController {
 		}
 		var errorText = "";
 		if ( !success ) {
-			errorText = !string.IsNullOrEmpty(resp.Text) ? resp.Text : resp.Code.ToString();
+			errorText = resp.GetNonEmptyText();
 		}
-		callback?.Invoke(success, errorText);
+		callback?.Invoke(success, TextUtils.TrimQuotes(errorText));
 	}
 
 	Jwtoken ExtractToken(string json) {

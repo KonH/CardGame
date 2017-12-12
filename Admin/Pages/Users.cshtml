@@ -1,0 +1,22 @@
+﻿@page
+@model UsersModel
+@{
+    ViewData["Title"] = "Users";
+}
+<h2>@ViewData["Title"]</h2>
+<ul>
+    @foreach ( var user in Model.Users ) {
+        <li>
+            <b>@user.Name</b> (@user.Login:@user.PasswordHash), @user.Role
+            <form method="get" action="EditUser">
+                <input type="hidden" name="login" value="@user.Login" />
+                <input type="submit" value="Edit" />
+            </form>
+        </li>
+    }
+    <li>
+        <form method="get" action="EditUser">
+            <input type="submit" value="Add"/>
+        </form>
+    </li>
+</ul>

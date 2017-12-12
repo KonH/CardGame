@@ -7,7 +7,6 @@ public class LoginUI : MonoBehaviour {
 	public InputField LoginField;
 	public InputField PasswordField;
 	public Button     LoginButton;
-	public Text       ResultText;
 
 	void Start () {
 		LoginButton.onClick.AddListener(TryLogin);
@@ -31,7 +30,7 @@ public class LoginUI : MonoBehaviour {
 		if ( success ) {
 			Scene.LoadSceneByName("Main");
 		} else {
-			ResultText.text = errorText;
+			NoticeWindow.ShowWithOkButton("Server Error", errorText);
 		}
 	}
 }

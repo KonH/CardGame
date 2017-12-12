@@ -9,3 +9,7 @@ SharedLibrary-Tests/obj/
 Server-Tests/bin/
 Server-Tests/obj/
 .vs/
+Admin/bin/
+Admin/obj/
+ServerSharedLibrary/bin/
+ServerSharedLibrary/obj/
