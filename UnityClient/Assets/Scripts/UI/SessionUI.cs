@@ -23,13 +23,19 @@ public class SessionUI : MonoBehaviour {
 
 	void Start() {
 		UpdateSessions(new List<Session>());
+		Events.Subscribe<Common_Error>(this, OnError);
 		Events.Subscribe<Session_Update>(this, OnSessionUpdate);
 		Events.Subscribe<Session_ConnectComplete>(this, OnConnectComplete);
 	}
 
 	void OnDestroy() {
+		Events.Unsubscribe<Common_Error>(OnError);
 		Events.Unsubscribe<Session_Update>(OnSessionUpdate);
 		Events.Unsubscribe<Session_ConnectComplete>(OnConnectComplete);
+	}
+
+	void OnError(Common_Error e) {
+		NoticeWindow.ShowWithOkButton("Server Error", e.Text, () => Scene.LoadSceneByName("Login"));
 	}
 
 	void UpdateSessions(List<Session> sessions) {

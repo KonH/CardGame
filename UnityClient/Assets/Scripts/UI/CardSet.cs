@@ -23,16 +23,31 @@ public class CardSet : MonoBehaviour {
 		_cards.Clear();
 	}
 
-	public void Add(CardView view) {
+	public void Add(CardView view, bool attach = true) {
 		_cards.Add(view);
-		view.transform.SetParent(transform, false);
-		view.transform.localScale = Vector3.one;
 		var index = _cards.Count - 1;
-		Action callback = null;
-		if ( view.Interactable ) {
-			callback = () => OnCardClick(index);
+		ProcessNewCard(view, index, attach);
+
+	}
+
+	public void Insert(CardView view, int index, bool attach = true) {
+		_cards.Insert(index, view);
+		ProcessNewCard(view, index, attach);
+	}
+
+	void ProcessNewCard(CardView view, int index, bool attach) {
+		view.transform.SetParent(transform, !attach);
+		view.transform.SetSiblingIndex(index);
+		view.transform.localScale = Vector3.one;
+		view.AddCallback(() => OnCardClick(index));
+	}
+
+	public void Remove(CardView view, bool recycle) {
+		_cards.Remove(view);
+		view.transform.SetParent(null);
+		if ( recycle ) {
+			ObjectPool.Recycle(view);
 		}
-		view.AddCallback(callback);
 	}
 
 	void OnCardClick(int index) {
