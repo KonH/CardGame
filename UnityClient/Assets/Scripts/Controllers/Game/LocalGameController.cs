@@ -10,7 +10,7 @@ public class LocalGameController : BaseGameController {
 
 	public override GameState State {
 		get {
-			return _fullState.Filter(User.Name);
+			return _fullState?.Filter(User.Name);
 		}
 	}
 

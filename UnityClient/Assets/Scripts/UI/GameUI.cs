@@ -11,6 +11,66 @@ using UDBase.Controllers.LogSystem;
 using DG.Tweening;
 
 public class GameUI : MonoBehaviour {
+	abstract class UIState {
+		public virtual bool CanTurn { get; }
+		public virtual bool IsPlayerHandActive(CardState card) => false;
+		public virtual bool IsPlayerTableActive(CardState card) => false;
+		public virtual bool IsEnemyTableActive(CardState card) => false;
+		public virtual bool IsEnemyUserActive(CardState card) => false;
+	}
+
+	class EmptyState : UIState {
+
+	}
+
+	class PlayerTurnState : UIState {
+		public override bool CanTurn => true;
+
+		public override bool IsPlayerHandActive(CardState card) {
+			return ( card != null ) && Game.CanBought(card);
+		}
+
+		public override bool IsPlayerTableActive(CardState card) {
+			return ( card != null ) && ( card.Actions > 0 );
+		}
+	}
+
+	class PlayerBuyState : UIState {
+		public int HandIndex { get; private set; }
+
+		public PlayerBuyState(int handIndex) {
+			HandIndex = handIndex;
+		}
+
+		public override bool IsPlayerHandActive(CardState card) {
+			return (card != null) && (Game.GetUserState().HandSet.IndexOf(card) == HandIndex);
+		}
+
+		public override bool IsPlayerTableActive(CardState card) {
+			return (card == null);
+		}
+	}
+
+	class PlayerSelectTargetState : UIState {
+		public int TableIndex { get; private set; }
+
+		public PlayerSelectTargetState(int tableIndex) {
+			TableIndex = tableIndex;
+		}
+
+		public override bool IsEnemyUserActive(CardState card) {
+			return true;
+		}
+
+		public override bool IsEnemyTableActive(CardState card) {
+			return card != null;
+		}
+	}
+
+	class EnemyTurnState : UIState {}
+
+	class EndGameState : UIState {}
+
 	public UserView Player;
 	public UserView Enemy;
 	public Button TurnButton;
@@ -18,11 +78,16 @@ public class GameUI : MonoBehaviour {
 
 	Dictionary<Type, Action<object>> _handlers = new Dictionary<Type, Action<object>>();
 
-	// TODO: States
-	bool _inBuySelection;
-	bool _inAttackSelection;
-	int  _selectedHandIndex;
-	int  _selectedTableIndex;
+	UIState _state;
+	UIState State {
+		get {
+			return _state;
+		}
+		set {
+			_state = value;
+			OnStateChanged(_state);
+		}
+	}
 
 	void Awake() {
 		TurnButton.onClick.AddListener(OnTurnClick);
@@ -40,6 +105,8 @@ public class GameUI : MonoBehaviour {
 		Player.Table.Init(OnPlayerTableCardClick);
 		Enemy.Table.Init(OnEnemyTableCardClick);
 		Enemy.User.Init(OnEnemyUserCardClick);
+
+		State = new EmptyState();
 
 		Events.Subscribe<Game_Init>(this, OnGameInit);
 		Events.Subscribe<Game_Reload>(this, OnGameReload);
@@ -79,15 +146,21 @@ public class GameUI : MonoBehaviour {
 	}
 
 	void FullStateUpdate(GameState state) {
-		_inBuySelection = false;
-		_inAttackSelection = false;
+		State = new EmptyState();
 		var users = state.Users;
 		foreach ( var user in users ) {
 			var active = user.Name == state.TurnOwner;
 			DrawUserState(user, active, true);
-			if ( user.Name == User.Name ) {
-				UpdateControlState(active);
-			}
+		}
+		StartActualState();
+		UpdateControls();
+	}
+
+	void StartActualState() {
+		if ( User.Name == Game.State.TurnOwner ) {
+			State = new PlayerTurnState();
+		} else {
+			State = new EnemyTurnState();
 		}
 	}
 
@@ -98,8 +171,28 @@ public class GameUI : MonoBehaviour {
 		return Enemy;
 	}
 
-	void UpdateControlState(bool active) {
-		TurnButton.interactable = active;
+	void UpdateControls() {
+		TurnButton.interactable = State.CanTurn;
+		var playerState = Game.GetUserState();
+		var enemyState = Game.GetEnemyState();
+		UpdateCardInteraction(playerState?.HandSet, Player.Hand, State.IsPlayerHandActive);
+		UpdateCardInteraction(playerState?.TableSet, Player.Table, State.IsPlayerTableActive);
+		UpdateCardInteraction(enemyState?.TableSet, Enemy.Table, State.IsEnemyTableActive);
+		UpdateCardInteraction(Enemy.User, State.IsEnemyUserActive);
+	}
+
+	void UpdateCardInteraction(List<CardState> states, CardSet set, Func<CardState, bool> isInteractive) {
+		for ( var i = 0; i < set.Cards.Count; i++ ) {
+			var state = states?[i];
+			var view = set.Cards[i];
+			view.UpdateInteractable(isInteractive(state));
+		}
+	}
+
+	void UpdateCardInteraction(CardSet set, Func<CardState, bool> isInteractive) {
+		foreach ( var view in set.Cards ) {
+			view.UpdateInteractable(isInteractive(null));
+		}
 	}
 
 	bool GetHandCardInteractable(bool activeUser, CardState card) {
@@ -119,14 +212,14 @@ public class GameUI : MonoBehaviour {
 		if ( !full ) {
 			return;
 		}
-		UpdateUserHolder(false, view.User);
+		UpdateUserHolder(view.User);
 		UpdateGlobalCount(userState.GlobalSet.Count, view.Global);
-		UpdateCards(userState.HandSet, view.Hand, (card) => GetHandCardInteractable(activeUser, card));
-		UpdateTableSet(userState, view.Table, activeUser);
+		UpdateCards(userState.HandSet, view.Hand);
+		UpdateTableSet(userState, view.Table);
 	}
 
-	void UpdateTableSet(UserState userState, CardSet set, bool activeUser) {
-		UpdateCards(userState.TableSet, set, (card) => (card != null) && activeUser && card.Actions > 0);
+	void UpdateTableSet(UserState userState, CardSet set) {
+		UpdateCards(userState.TableSet, set);
 	}
 
 	CardView GetFirstOrCreateView(CardSet set) {
@@ -140,32 +233,31 @@ public class GameUI : MonoBehaviour {
 		return view;
 	}
 
-	CardView CreateCardView(CardState card, Func<CardState, bool> interactable) {
+	CardView CreateCardView(CardState card) {
 		var cardView = ObjectPool.Spawn(CardPrefab);
-		var interactableState = (interactable != null) && interactable(card);
 		if ( card == null ) {
-			cardView.InitPlaceholder(interactableState);
+			cardView.InitPlaceholder();
 		} else {
-			cardView.Init(true, interactableState, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth);
+			cardView.Init(true, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth);
 		}
 		return cardView;
 	}
 
-	void UpdateUserHolder(bool interactable, CardSet userSet) {
+	void UpdateUserHolder(CardSet userSet) {
 		var userCardView = GetFirstOrCreateView(userSet);
-		userCardView.InitPlaceholder(interactable);
+		userCardView.InitPlaceholder();
 	}
 
 	void UpdateGlobalCount(int count, CardSet global) {
 		var globalCardView = GetFirstOrCreateView(global);
-		globalCardView.Init(true, false, count.ToString(), 0, 0, 0, 0);
+		globalCardView.Init(true, count.ToString(), 0, 0, 0, 0);
 	}
 
-	void UpdateCards(List<CardState> cards, CardSet set, Func<CardState, bool> interactable) {
+	void UpdateCards(List<CardState> cards, CardSet set) {
 		set.Clear();
 		for ( var i = 0; i < cards.Count; i++ ) {
 			var card = cards[i];
-			var cardView = CreateCardView(card, interactable);
+			var cardView = CreateCardView(card);
 			set.Add(cardView);
 		}
 	}
@@ -174,69 +266,53 @@ public class GameUI : MonoBehaviour {
 		Game.NextTurn();
 	}
 
-	void ResetBuySelection(UserState userState) {
-		UpdateTableSet(userState, Player.Table, true);
-	}
-
 	void OnPlayerHandCardClick(int index) {
-		var userState = Game.GetUserState();
-		if ( _inBuySelection ) {
-			_inBuySelection = false;
-			ResetBuySelection(userState);
+		if ( State is PlayerBuyState ) {
+			State = new PlayerTurnState();
 		} else {
-			_inBuySelection = true;
-			_selectedHandIndex = index;
-			UpdateCards(userState.TableSet, Player.Table, (card) => card == null);
+			State = new PlayerBuyState(index);
 		}
 	}
 
 	void OnPlayerTableCardClick(int index) {
 		var userState = Game.GetUserState();
-		if ( _inBuySelection && (userState.TableSet[index] == null) ) {
-			TryMakeBuyAction(userState, _selectedHandIndex, index);
+		var buyState = State as PlayerBuyState;
+		if ( buyState != null ) {
+			if ( userState.TableSet[index] == null ) {
+				TryMakeBuyAction(buyState.HandIndex, index);
+			}
 		} else {
-			TryStartAttackAction(userState, index);
+			var selectTargetState = State as PlayerSelectTargetState;
+			if ( selectTargetState != null ) {
+				State = new PlayerTurnState();
+			} else {
+				State = new PlayerSelectTargetState(index);
+			}
 		}
 	}
 
-	void TryStartAttackAction(UserState userState, int tableIndex) {
-		if ( _inAttackSelection ) {
-			_inAttackSelection = false;
-			ResetAttackSelection();
-		} else {
-			_inAttackSelection = true;
-			_selectedTableIndex = tableIndex;
-			var enemyTable = Game.GetEnemyState().TableSet;
-			UpdateCards(enemyTable, Enemy.Table, c => (c != null));
-			UpdateUserHolder(true, Enemy.User);
-		}
-	}
-
-	void TryMakeBuyAction(UserState userState, int handIndex, int tableIndex) {
-		_inBuySelection = false;
-		ResetBuySelection(userState);
+	void TryMakeBuyAction(int handIndex, int tableIndex) {
+		State = new PlayerTurnState();
 		var action = new BuyCreatureAction("", handIndex, tableIndex);
 		Game.ApplyAction(action);
 	}
 
-	void ResetAttackSelection() {
-		var enemyTable = Game.GetEnemyState().TableSet;
-		UpdateCards(enemyTable, Enemy.Table, _ => false);
-		UpdateUserHolder(false, Enemy.User);
-	}
-
 	void OnEnemyTableCardClick(int index) {
-		_inAttackSelection = false;
-		ResetAttackSelection();
-		var action = new AttackCreatureAction("", _selectedTableIndex, index);
-		Game.ApplyAction(action);
+		var selectTargetState = State as PlayerSelectTargetState;
+		if ( selectTargetState != null ) {
+			State = new PlayerTurnState();
+			var action = new AttackCreatureAction("", selectTargetState.TableIndex, index);
+			Game.ApplyAction(action);
+		}
 	}
 
 	void OnEnemyUserCardClick(int index) {
-		_inAttackSelection = false;
-		ResetAttackSelection();
-		var action = new AttackPlayerAction("", _selectedTableIndex);
-		Game.ApplyAction(action);
+		var selectTargetState = State as PlayerSelectTargetState;
+		if ( selectTargetState != null ) {
+			State = new PlayerTurnState();
+			var action = new AttackPlayerAction("", selectTargetState.TableIndex);
+			Game.ApplyAction(action);
+		}
 	}
 
 	void OnGameNewAction(Game_NewAction e) {
@@ -261,10 +337,14 @@ public class GameUI : MonoBehaviour {
 		var isUserTurn = User.Name == Game.State.TurnOwner;
 		DrawUserState(Game.GetUserState(), isUserTurn, false);
 		DrawUserState(Game.GetEnemyState(), false, false);
+		UpdateControls();
 	}
 
 	void OnTurnAction(TurnAction action) {
-		Action callback = PerformCommonCallback;
+		Action callback = () => {
+			PerformCommonCallback();
+			StartActualState();
+		};
 		var state = GetUserState(action);
 		var view = GetUserView(action);
 		if ( CheckNewCards(state, view.Hand, callback) ) {
@@ -318,9 +398,8 @@ public class GameUI : MonoBehaviour {
 	bool CheckNewCards(UserState userState, CardSet handSet, Action callback) {
 		var userHand = userState.HandSet;
 		if ( userHand.Count > handSet.Cards.Count ) {
-			var isActiveUser = userState.Name == User.Name;
 			var cardToSpawn = userHand[userHand.Count - 1];
-			var cardView = CreateCardView(cardToSpawn, card => GetHandCardInteractable(isActiveUser, card));
+			var cardView = CreateCardView(cardToSpawn);
 			handSet.Add(cardView);
 			var trans = cardView.transform;
 			trans.localScale = Vector3.zero;
@@ -328,5 +407,10 @@ public class GameUI : MonoBehaviour {
 			return true;
 		}
 		return false;
+	}
+
+	void OnStateChanged(UIState state) {
+		Log.MessageFormat("New UI State: {0}", LogTags.UI, state.GetType());
+		UpdateControls();
 	}
 }

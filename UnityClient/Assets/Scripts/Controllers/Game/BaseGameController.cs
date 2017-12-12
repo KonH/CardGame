@@ -101,11 +101,11 @@ public abstract class BaseGameController : IGame {
 	}
 
 	public UserState GetUserState() {
-		return State.Users.Find(u => u.Name == User.Name);
+		return State?.Users.Find(u => u.Name == User.Name);
 	}
 
 	public UserState GetEnemyState() {
-		return State.Users.Find(u => u.Name != User.Name);
+		return State?.Users.Find(u => u.Name != User.Name);
 	}
 
 	public void ApplyEnd() {

@@ -38,9 +38,9 @@ public class CardView : MonoBehaviour {
 		SetText(text, content > 0 ? content.ToString() : "");
 	}
 
-	public void Init(bool withContent, bool interactable, string name, int price, int attack, int hp, int maxHp) {
+	public void Init(bool withContent, string name, int price, int attack, int hp, int maxHp) {
 		_seq = TweenHelper.Reset(_seq);
-		Button.gameObject.SetActive(interactable);
+		Button.gameObject.SetActive(false);
 		Content.SetActive(withContent);
 		SetText(Name,   name);
 		SetText(Price,  price);
@@ -52,8 +52,8 @@ public class CardView : MonoBehaviour {
 		}
 	}
 
-	public void InitPlaceholder(bool interactable) {
-		Init(false, interactable, string.Empty, 0, 0, 0, 0);
+	public void InitPlaceholder() {
+		Init(false, string.Empty, 0, 0, 0, 0);
 	}
 
 	public void AddCallback(Action callback) {
@@ -77,8 +77,10 @@ public class CardView : MonoBehaviour {
 	}
 
 	void OnClick() {
-		if ( _callback != null ) {
-			_callback();
-		}
+		_callback?.Invoke();
+	}
+
+	public void UpdateInteractable(bool value) {
+		Button.gameObject.SetActive(value);
 	}
 }

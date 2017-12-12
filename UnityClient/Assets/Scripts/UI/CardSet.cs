@@ -39,11 +39,7 @@ public class CardSet : MonoBehaviour {
 		view.transform.SetParent(transform, !attach);
 		view.transform.SetSiblingIndex(index);
 		view.transform.localScale = Vector3.one;
-		Action callback = null;
-		if ( view.Interactable ) {
-			callback = () => OnCardClick(index);
-		}
-		view.AddCallback(callback);
+		view.AddCallback(() => OnCardClick(index));
 	}
 
 	public void Remove(CardView view, bool recycle) {
