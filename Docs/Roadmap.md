@@ -21,10 +21,14 @@
 
 # Basic UX
 
-- [ ] Card animations (get, buy, attack, damage, destroy)
+- [x] Card animations (get, buy, attack)
 - [x] Dialogs (error, end, lost connection)
 - [ ] Mock art
 - [x] Handle lost connection
+
+# Next UX
+
+- [ ] Many anims: damage, destroy
 
 # Basic web admin app
 

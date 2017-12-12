@@ -94,6 +94,7 @@ public class GameUI : MonoBehaviour {
 
 		AddHandler<TurnAction>(OnTurnAction);
 		AddHandler<BuyCreatureAction>(OnBuyCreatureAction);
+		AddHandler<AttackPlayerAction>(OnAttackPlayerAction);
 	}
 
 	void AddHandler<T>(Action<T> handler) where T : class, IGameAction {
@@ -315,6 +316,39 @@ public class GameUI : MonoBehaviour {
 		}
 	}
 
+	UserView GetUserView(BaseGameAction action) {
+		return GetUserView(action.User);
+	}
+
+	UserView GetUserView(string userName) {
+		if ( userName == User.Name ) {
+			return Player;
+		}
+		return Enemy;
+	}
+
+	UserView GetAnotherUserView(BaseGameAction action) {
+		return GetAnotherUserView(action.User);
+	}
+
+	UserView GetAnotherUserView(string userName) {
+		if ( userName != User.Name ) {
+			return Player;
+		}
+		return Enemy;
+	}
+
+	UserState GetUserState(BaseGameAction action) {
+		return GetUserState(action.User);
+	}
+
+	UserState GetUserState(string userName) {
+		if ( userName == User.Name ) {
+			return Game.GetUserState();
+		}
+		return Game.GetEnemyState();
+	}
+
 	void OnGameNewAction(Game_NewAction e) {
 		var type = e.Action.GetType();
 		foreach ( var handler in _handlers ) {
@@ -353,30 +387,21 @@ public class GameUI : MonoBehaviour {
 		callback();
 	}
 
-	UserView GetUserView(BaseGameAction action) {
-		return GetUserView(action.User);
-	}
-
-	UserView GetUserView(string userName) {
-		if ( userName == User.Name ) {
-			return Player;
+	bool CheckNewCards(UserState userState, CardSet handSet, Action callback) {
+		var userHand = userState.HandSet;
+		if ( userHand.Count > handSet.Cards.Count ) {
+			var cardToSpawn = userHand[userHand.Count - 1];
+			var cardView = CreateCardView(cardToSpawn);
+			handSet.Add(cardView);
+			var trans = cardView.transform;
+			trans.localScale = Vector3.zero;
+			cardView.SetEffect(trans.DOScale(Vector3.one, 0.33f), callback);
+			return true;
 		}
-		return Enemy;
-	}
-
-	UserState GetUserState(BaseGameAction action) {
-		return GetUserState(action.User);
-	}
-
-	UserState GetUserState(string userName) {
-		if ( userName == User.Name ) {
-			return Game.GetUserState();
-		}
-		return Game.GetEnemyState();
+		return false;
 	}
 
 	void OnBuyCreatureAction(BuyCreatureAction action) {
-		Action callback = PerformCommonCallback;
 		var userView = GetUserView(action);
 		var hand = userView.Hand;
 		var table = userView.Table;
@@ -392,21 +417,17 @@ public class GameUI : MonoBehaviour {
 		seq.AppendInterval(0.01f);
 		seq.AppendCallback(() => cardToSpawn.Root.SetParent(cardToSpawn.transform, true));
 		seq.Append(cardToSpawn.Root.DOLocalMove(Vector3.zero, 0.33f, true));
-		cardToSpawn.SetEffect(seq, callback);
+		cardToSpawn.SetEffect(seq, PerformCommonCallback);
 	}
 
-	bool CheckNewCards(UserState userState, CardSet handSet, Action callback) {
-		var userHand = userState.HandSet;
-		if ( userHand.Count > handSet.Cards.Count ) {
-			var cardToSpawn = userHand[userHand.Count - 1];
-			var cardView = CreateCardView(cardToSpawn);
-			handSet.Add(cardView);
-			var trans = cardView.transform;
-			trans.localScale = Vector3.zero;
-			cardView.SetEffect(trans.DOScale(Vector3.one, 0.33f), callback);
-			return true;
-		}
-		return false;
+	void OnAttackPlayerAction(AttackPlayerAction action) {
+		var dealerUser = GetUserView(action);
+		var cardToAttack = dealerUser.Table.Cards[action.DealerIndex];
+		var targetUser = GetAnotherUserView(action).User.Cards[0];
+		var seq = DOTween.Sequence();
+		seq.Append(cardToAttack.Root.transform.DOMove(targetUser.Root.transform.position, 0.33f));
+		seq.Append(cardToAttack.Root.transform.DOLocalMove(Vector3.zero, 0.22f, true));
+		cardToAttack.SetEffect(seq, PerformCommonCallback);
 	}
 
 	void OnStateChanged(UIState state) {
