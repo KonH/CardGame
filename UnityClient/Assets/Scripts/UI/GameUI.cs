@@ -207,8 +207,8 @@ public class GameUI : MonoBehaviour {
 			nameText = string.Format("<b>{0}</b>", nameText);
 		}
 		view.NameText.text = nameText;
-		view.HPText.text = string.Format("HP: {0}/{1}", userState.Health, userState.MaxHealth);
-		view.PowerText.text = string.Format("PW: {0}/{1}", userState.Power, userState.MaxPower);
+		view.HPText.text = string.Format("{0}/{1}", userState.Health, userState.MaxHealth);
+		view.PowerText.text = string.Format("{0}/{1}", userState.Power, userState.MaxPower);
 
 		if ( !full ) {
 			return;
@@ -239,7 +239,7 @@ public class GameUI : MonoBehaviour {
 		if ( card == null ) {
 			cardView.InitPlaceholder();
 		} else {
-			cardView.Init(true, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth);
+			cardView.Init(true, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth, card.Type != CardType.Hidden);
 		}
 		return cardView;
 	}
@@ -251,7 +251,7 @@ public class GameUI : MonoBehaviour {
 
 	void UpdateGlobalCount(int count, CardSet global) {
 		var globalCardView = GetFirstOrCreateView(global);
-		globalCardView.Init(true, count.ToString(), 0, 0, 0, 0);
+		globalCardView.Init(true, count.ToString(), 0, 0, 0, 0, false);
 	}
 
 	void UpdateCards(List<CardState> cards, CardSet set) {

@@ -12,6 +12,7 @@ public class CardView : MonoBehaviour {
 	public Text       Price;
 	public Text       Attack;
 	public Text       Hp;
+	public Image      Cover;
 
 	Sequence _seq;
 	Action   _callback;
@@ -28,7 +29,7 @@ public class CardView : MonoBehaviour {
 
 	void SetText(Text text, string content) {
 		var valid    = !string.IsNullOrEmpty(content);
-		text.enabled = valid;
+		text.gameObject.SetActive(valid);
 		if ( valid ) {
 			text.text = content;
 		}
@@ -38,7 +39,7 @@ public class CardView : MonoBehaviour {
 		SetText(text, content > 0 ? content.ToString() : "");
 	}
 
-	public void Init(bool withContent, string name, int price, int attack, int hp, int maxHp) {
+	public void Init(bool withContent, string name, int price, int attack, int hp, int maxHp, bool withCover) {
 		_seq = TweenHelper.Reset(_seq);
 		Button.gameObject.SetActive(false);
 		Content.SetActive(withContent);
@@ -50,10 +51,11 @@ public class CardView : MonoBehaviour {
 		} else {
 			SetText(Hp, "");
 		}
+		Cover.enabled = withCover;
 	}
 
 	public void InitPlaceholder() {
-		Init(false, string.Empty, 0, 0, 0, 0);
+		Init(false, string.Empty, 0, 0, 0, 0, false);
 	}
 
 	public void AddCallback(Action callback) {

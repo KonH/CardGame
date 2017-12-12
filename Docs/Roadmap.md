@@ -23,12 +23,13 @@
 
 - [x] Card animations (get, buy, attack)
 - [x] Dialogs (error, end, lost connection)
-- [ ] Mock art
+- [x] Mock game art
 - [x] Handle lost connection
 
 # Next UX
 
 - [ ] Many anims: damage, destroy
+- [ ] Login, sessions UI
 
 # Basic web admin app
 
