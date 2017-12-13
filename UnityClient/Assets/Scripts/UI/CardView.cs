@@ -15,7 +15,7 @@ public class CardView : MonoBehaviour {
 	public Image      Cover;
 
 	Sequence _seq;
-	Action   _callback;
+	Action<CardView> _callback;
 
 	public bool Interactable {
 		get {
@@ -58,7 +58,7 @@ public class CardView : MonoBehaviour {
 		Init(false, string.Empty, 0, 0, 0, 0, false);
 	}
 
-	public void AddCallback(Action callback) {
+	public void AddCallback(Action<CardView> callback) {
 		_callback = callback;
 	}
 
@@ -79,7 +79,7 @@ public class CardView : MonoBehaviour {
 	}
 
 	void OnClick() {
-		_callback?.Invoke();
+		_callback?.Invoke(this);
 	}
 
 	public void UpdateInteractable(bool value) {

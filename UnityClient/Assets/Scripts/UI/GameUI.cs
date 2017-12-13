@@ -95,6 +95,7 @@ public class GameUI : MonoBehaviour {
 		AddHandler<TurnAction>(OnTurnAction);
 		AddHandler<BuyCreatureAction>(OnBuyCreatureAction);
 		AddHandler<AttackPlayerAction>(OnAttackPlayerAction);
+		AddHandler<AttackCreatureAction>(OnAttackCreatureAction);
 	}
 
 	void AddHandler<T>(Action<T> handler) where T : class, IGameAction {
@@ -239,9 +240,20 @@ public class GameUI : MonoBehaviour {
 		if ( card == null ) {
 			cardView.InitPlaceholder();
 		} else {
-			cardView.Init(true, card.Type.ToString(), card.Price, card.Damage, card.Health, card.MaxHealth, card.Type != CardType.Hidden);
+			InitCardView(card, cardView);
 		}
 		return cardView;
+	}
+
+	void InitCardView(CardState card, CardView view) {
+		view.Init(
+			true,
+			card.Type != CardType.Hidden ? card.Type.ToString() : string.Empty,
+			card.Price,
+			card.Damage,
+			card.Health,
+			card.MaxHealth,
+			card.Type != CardType.Hidden);
 	}
 
 	void UpdateUserHolder(CardSet userSet) {
@@ -349,6 +361,13 @@ public class GameUI : MonoBehaviour {
 		return Game.GetEnemyState();
 	}
 
+	UserState GetAnotherUserState(BaseGameAction action) {
+		if ( action.User != User.Name ) {
+			return Game.GetUserState();
+		}
+		return Game.GetEnemyState();
+	}
+
 	void OnGameNewAction(Game_NewAction e) {
 		var type = e.Action.GetType();
 		foreach ( var handler in _handlers ) {
@@ -405,11 +424,18 @@ public class GameUI : MonoBehaviour {
 		var userView = GetUserView(action);
 		var hand = userView.Hand;
 		var table = userView.Table;
-		var cardToSpawn = hand.Cards[action.HandIndex];
+		CardView cardToSpawn = null;
+		if ( action.HandIndex >= hand.Cards.Count ) {
+			cardToSpawn = CreateCardView(GetUserState(action).TableSet[action.TableIndex]);
+			hand.Cards.Add(cardToSpawn);
+		}
+		cardToSpawn = hand.Cards[action.HandIndex];
 		var oldPos = cardToSpawn.Root.position;
+		var newCardState = GetUserState(action).TableSet[action.TableIndex];
+		InitCardView(newCardState, cardToSpawn);
 		cardToSpawn.Root.SetParent(GameObject.FindObjectOfType<Canvas>().transform, true);
 		hand.Remove(cardToSpawn, false);
-		var cardToReplace = table.Cards[action.TableIndex];
+		CardView cardToReplace = table.Cards[action.TableIndex];
 		var newPos = cardToReplace.Root.transform.position;
 		table.Remove(cardToReplace, true);
 		table.Insert(cardToSpawn, action.TableIndex);
@@ -428,6 +454,25 @@ public class GameUI : MonoBehaviour {
 		seq.Append(cardToAttack.Root.transform.DOMove(targetUser.Root.transform.position, 0.33f));
 		seq.Append(cardToAttack.Root.transform.DOLocalMove(Vector3.zero, 0.22f, true));
 		cardToAttack.SetEffect(seq, PerformCommonCallback);
+	}
+
+	void OnAttackCreatureAction(AttackCreatureAction action) {
+		var dealerUser = GetUserView(action);
+		var cardToAttack = dealerUser.Table.Cards[action.DealerIndex];
+		var targetSet = GetAnotherUserView(action).Table;
+		var targetCard = targetSet.Cards[action.VictimIndex];
+		var seq = DOTween.Sequence();
+		seq.Append(cardToAttack.Root.transform.DOMove(targetCard.Root.transform.position, 0.33f));
+		seq.Append(cardToAttack.Root.transform.DOLocalMove(Vector3.zero, 0.22f, true));
+		cardToAttack.SetEffect(seq, () => {
+			var targetCardState = GetAnotherUserState(action).TableSet[action.VictimIndex];
+			if ( targetCardState == null ) {
+				targetCard.InitPlaceholder();
+			} else {
+				InitCardView(targetCardState, targetCard);
+			}
+			PerformCommonCallback();
+		});
 	}
 
 	void OnStateChanged(UIState state) {

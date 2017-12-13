@@ -27,7 +27,6 @@ public class CardSet : MonoBehaviour {
 		_cards.Add(view);
 		var index = _cards.Count - 1;
 		ProcessNewCard(view, index, attach);
-
 	}
 
 	public void Insert(CardView view, int index, bool attach = true) {
@@ -39,7 +38,7 @@ public class CardSet : MonoBehaviour {
 		view.transform.SetParent(transform, !attach);
 		view.transform.SetSiblingIndex(index);
 		view.transform.localScale = Vector3.one;
-		view.AddCallback(() => OnCardClick(index));
+		view.AddCallback(OnCardClick);
 	}
 
 	public void Remove(CardView view, bool recycle) {
@@ -50,7 +49,7 @@ public class CardSet : MonoBehaviour {
 		}
 	}
 
-	void OnCardClick(int index) {
-		_clickCallback(index);
+	void OnCardClick(CardView view) {
+		_clickCallback(Cards.IndexOf(view));
 	}
 }
