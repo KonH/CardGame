@@ -49,6 +49,11 @@
 
 # Basic AI
 
-- [ ] Buy, attack
-- [ ] Select action with better weight
-- [ ] Small randomization
+- [x] Buy, attack
+- [x] Select action with better weight
+- [ ] Debug it
+- [ ] Small randomization 
+
+# Fixes
+
+- [ ] Client: Update global count
