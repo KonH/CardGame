@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SharedLibrary.AI;
 using SharedLibrary.Common;
 using SharedLibrary.Models;
 using SharedLibrary.Models.Game;
@@ -14,6 +15,14 @@ namespace SharedLibrary_Tests {
 			get {
 				return new GameState(Users, "1");
 			}
-		} 
+		}
+
+		public static (GameState, GameAI) GameStateWithBot {
+			get {
+				var state = GameState;
+				var bot = new GameAI(state.Users[1].Name);
+				return (state, bot);
+			}
+		}
 	}
 }

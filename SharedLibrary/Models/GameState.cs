@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using SharedLibrary.Common;
 using SharedLibrary.Models.Game;
 
@@ -80,6 +81,30 @@ namespace SharedLibrary.Models {
 				var table   = user.TableSet;
 				var hand    = user.Name == userName ? user.HandSet : HideCards(user.HandSet);
 				var global  = HideCards(user.GlobalSet);
+				var newUser = new UserState(
+					user.Name,
+					user.Health,
+					user.MaxHealth,
+					user.Power,
+					user.MaxPower,
+					table,
+					hand,
+					global);
+				state.Users.Add(newUser);
+			}
+			return state;
+		}
+
+		List<CardState> CloneCards(List<CardState> cards) {
+			return cards.Select(c => c?.Clone()).ToList();
+		}
+
+		public GameState Clone() {
+			var state = new GameState(TurnOwner, Version, Turn);
+			foreach ( var user in Users ) {
+				var table   = CloneCards(user.TableSet);
+				var hand    = CloneCards(user.HandSet);
+				var global  = CloneCards(user.GlobalSet);
 				var newUser = new UserState(
 					user.Name,
 					user.Health,

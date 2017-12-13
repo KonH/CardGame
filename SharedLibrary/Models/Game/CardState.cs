@@ -55,5 +55,11 @@ namespace SharedLibrary.Models.Game {
 			Stats.Add("MaxActions", max);
 			return this;
 		}
+
+		public CardState Clone() {
+			var state = new CardState(Type);
+			state.Stats = new Dictionary<string, int>(Stats);
+			return state;
+		}
 	}
 }
