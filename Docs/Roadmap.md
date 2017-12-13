@@ -46,3 +46,9 @@
 - [x] Client/server: Password => hash(pass+salt(login))
 - [ ] Admin: Setup password input
 - [ ] Admin: Connection config and trusted hosts list
+
+# Basic AI
+
+- [ ] Buy, attack
+- [ ] Select action with better weight
+- [ ] Small randomization
